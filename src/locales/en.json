@@ -1,0 +1,406 @@
+{
+  "common": {
+    "back": "← Back",
+    "bpm": "bpm",
+    "notAvailable": "Not available",
+    "available": "Available",
+    "delete": "Delete",
+    "ok": "OK",
+    "cancel": "Cancel",
+    "dateLocale": "en-US",
+    "drift": "Drift",
+    "quality": "Quality"
+  },
+  "app": {
+    "title": "Compensated Thresholds",
+    "subtitle": "Aerobic threshold analysis for trail running",
+    "single": {
+      "title": "Single activity",
+      "desc": "Analyze one run and calculate drift"
+    },
+    "multi": {
+      "title": "Multiple activities",
+      "desc": "Load several runs and find threshold automatically",
+      "open": "Open multi-activity analysis →"
+    },
+    "history": {
+      "title": "History",
+      "desc": "See aerobic threshold development over time",
+      "open": "Open history →"
+    },
+    "how": {
+      "title": "How does this work?",
+      "singleTitle": "Single activity:",
+      "single": "Load one FIT file — the app calculates GAP-compensated drift and DFA alpha1 analysis (if HRV data available)",
+      "multiTitle": "Multiple activities:",
+      "multi": "Load 3–6 runs at different HR zones → automatic threshold detection",
+      "historyTitle": "History:",
+      "history": "Save results and track AeT development throughout training",
+      "methodsTitle": "Two independent methods:",
+      "methods": "HR drift (Pa:Hr decoupling) and DFA alpha1 (HRV-based). When both are available, they cross-validate each other."
+    },
+    "save": "Save to history",
+    "saved": "✓ Saved",
+    "noHrv": {
+      "title": "DFA Alpha1 not available",
+      "text": "The file contains no RR interval data. DFA alpha1 analysis requires a chest strap heart rate monitor (Polar H10, Garmin HRM-Pro) that records beat-to-beat data. Enable HRV recording on your device."
+    },
+    "tooFewPoints": "Too few data points in selected range. Extend the analyzed section.",
+    "unknownError": "Unknown error",
+    "footer": "Based on <uphill>Uphill Athlete</uphill> method, <tp>TrainingPeaks</tp> Pa:Hr analysis, and <rogers>Rogers et al. (2021)</rogers> DFA alpha1 research."
+  },
+  "upload": {
+    "title": "Upload FIT file",
+    "instruction": "Drag and drop a .FIT file here or click to select",
+    "hint": "Export from Garmin Connect: Activity → ⚙️ → Export original"
+  },
+  "activity": {
+    "heading": "Activity",
+    "sport": "Sport",
+    "date": "Date",
+    "distance": "Distance",
+    "duration": "Duration",
+    "avgHr": "Avg HR",
+    "avgPace": "Avg pace",
+    "temperature": "Temperature",
+    "hrvData": "HRV data",
+    "beats": "beats",
+    "runningPower": "Running power",
+    "dataPoints": "Data points"
+  },
+  "trim": {
+    "heading": "Analysis settings",
+    "hrRange": "HR range:",
+    "zoom": {
+      "auto": "Auto",
+      "tight": "Tight",
+      "full": "Full",
+      "custom": "Custom",
+      "autoTitle": "Auto: analyzed section HR ±5 bpm",
+      "tightTitle": "Tight: analyzed section HR range only",
+      "fullTitle": "Full: all HR values included",
+      "customTitle": "Custom: set min/max manually",
+      "min": "Min",
+      "max": "Max",
+      "bpmRange": "{{range}} bpm range"
+    },
+    "chart": {
+      "hrLabel": "Heart rate (bpm)",
+      "hrTooltip": "HR: {{value}} bpm",
+      "warmup": "WARMUP",
+      "analyzed": "ANALYZED SECTION"
+    },
+    "startLabel": "Start time (warmup excluded)",
+    "endLabel": "End time",
+    "analyzedDuration": "Analyzed duration:",
+    "minRecommended": "(minimum 40 min recommended)",
+    "gapModel": "GAP model",
+    "gapStrava": "Strava (recommended)",
+    "gapMinetti": "Minetti (2002)",
+    "segments": "Segments"
+  },
+  "drift": {
+    "heading": "Drift analysis",
+    "gapDrift": "GAP-compensated drift:",
+    "suggestedAeT": "Estimated aerobic threshold (AeT):",
+    "temp": {
+      "heading": "Temperature compensation",
+      "temperature": "Temperature",
+      "effect": "Heat effect",
+      "compensated": "Compensated drift",
+      "noEffect": "no significant temperature compensation needed."
+    },
+    "comparison": {
+      "heading": "Half comparison",
+      "first": "1st half",
+      "second": "2nd half",
+      "change": "Change",
+      "hr": "Heart rate (bpm)",
+      "pace": "Pace",
+      "gapPace": "GAP pace",
+      "efRaw": "EF (raw)",
+      "efGap": "EF (GAP)",
+      "driftPrefix": "Drift:"
+    },
+    "note": {
+      "duration": "Analyzed duration:",
+      "explanation": "EF (Efficiency Factor) = speed / heart rate. When EF drops in the second half, heart rate has \"drifted\" upward relative to pace. The GAP-compensated value accounts for terrain, normalizing the effect of hills."
+    }
+  },
+  "dfa": {
+    "heading": "DFA Alpha1 analysis",
+    "noData": {
+      "hint": "DFA alpha1 requires beat-to-beat RR interval data. Make sure you're using a chest strap (e.g. Polar H10, Garmin HRM-Pro) with HRV recording enabled."
+    },
+    "hrv1": {
+      "label": "HRVT1 (AeT)",
+      "sub": "DFA α1 = 0.75"
+    },
+    "hrv2": {
+      "label": "HRVT2 (AnT/LT2)",
+      "sub": "DFA α1 = 0.50"
+    },
+    "crossVal": "Cross-validation",
+    "chart": {
+      "timeTitle": "DFA Alpha1 over time",
+      "dfaLabel": "DFA α1",
+      "hrvt1Label": "HRVT1 (0.75)",
+      "hrvt2Label": "HRVT2 (0.50)",
+      "vsTitle": "DFA Alpha1 vs. heart rate — thresholds",
+      "hrAxis": "Heart rate (bpm)",
+      "dfaAxis": "DFA α1",
+      "aetLine": "AeT (α1=0.75)",
+      "antLine": "AnT (α1=0.50)",
+      "hrvt1Line": "HRVT1: {{hr}} bpm",
+      "hrvt2Line": "HRVT2: {{hr}} bpm"
+    },
+    "quality": {
+      "heading": "Data quality",
+      "sensor": "Sensor",
+      "beats": "Heart beats",
+      "validWindows": "Valid windows",
+      "avgArtifacts": "Avg artifacts"
+    },
+    "sensor": {
+      "chest": "Chest strap (good)",
+      "optical": "Optical (insufficient for DFA)",
+      "unknown": "Unknown"
+    },
+    "cv": {
+      "excellent": "Excellent agreement",
+      "good": "Good agreement",
+      "fair": "Fair agreement",
+      "poor": "Poor agreement",
+      "detail": "Drift: {{drift}} bpm | DFA: {{dfa}} bpm (diff: {{diff}} bpm)"
+    }
+  },
+  "diagnostics": {
+    "status": {
+      "good": "Reliable analysis",
+      "acceptable": "Moderate reliability",
+      "poor": "Low reliability"
+    },
+    "heading": "Analysis reliability",
+    "toggle": {
+      "show": "▼ Show details",
+      "hide": "▲ Hide"
+    },
+    "qs": {
+      "quality": "Data quality",
+      "robustness": "Result robustness",
+      "warmup": "Warmup detection",
+      "ci": "90% confidence interval"
+    },
+    "quality": {
+      "heading": "Data quality",
+      "removed": "Removed {{count}} invalid data points."
+    },
+    "warmup": {
+      "heading": "Warmup detection",
+      "method": "Method",
+      "confidence": "Confidence",
+      "cutoff": "Cutoff point",
+      "hrAtCutoff": "HR at cutoff",
+      "chart": {
+        "title": "Warmup detection signals",
+        "hrLabel": "Heart rate (bpm)",
+        "stabilityLabel": "Stability",
+        "hrAxis": "Heart rate (bpm)",
+        "stabilityAxis": "Stability (lower = more stable)"
+      },
+      "methods": {
+        "hrPace": "HR + pace (combined)",
+        "hrOnly": "HR only",
+        "fallback": "Fallback method"
+      },
+      "conf": {
+        "high": "High",
+        "medium": "Moderate",
+        "low": "Low"
+      }
+    },
+    "sens": {
+      "warmupTitle": "Sensitivity: warmup cutoff",
+      "warmupNote": "How much drift changes with different warmup cutoff points. Stable chart = robust result.",
+      "warmupXAxis": "Warmup cutoff",
+      "warmupYAxis": "Drift (%)",
+      "warmupTooltip": "Drift: {{drift}}% | Analyzed: {{minutes}} min",
+      "gapTitle": "GAP model comparison",
+      "gapNote": {
+        "significant": "Model difference: {{diff}}% units. Terrain significantly affects the result.",
+        "minor": "Model difference: {{diff}}% units. Minor difference — terrain has little effect."
+      },
+      "gapXAxis": "Drift (%)",
+      "splitTitle": "Sensitivity: split point",
+      "splitNote": "How much drift changes when moving the half-split point. 50% = standard equal split.",
+      "splitXAxis": "1st half ratio",
+      "splitYAxis": "Drift (%)",
+      "ciTitle": "Bootstrap confidence interval (90%)"
+    },
+    "models": {
+      "raw": "Raw (no GAP)",
+      "strava": "Strava GAP",
+      "minetti": "Minetti GAP"
+    },
+    "ci": {
+      "tooFew": "Not enough data for bootstrap analysis.",
+      "p5": "5%: {{value}}%",
+      "median": "Median: {{value}}%",
+      "p95": "95%: {{value}}%",
+      "warningAeT": "⚠ Confidence interval crosses the 3.5% threshold — AeT estimate is uncertain.",
+      "warningLT": "⚠ Confidence interval crosses the 5% threshold — interpretation may vary."
+    },
+    "summary": "Summary:"
+  },
+  "history": {
+    "heading": "Threshold tracking",
+    "export": "Export JSON",
+    "import": "Import JSON",
+    "latestAeT": "Latest AeT",
+    "latestLT2": "Latest LT2",
+    "aetLt2": "AeT / LT2",
+    "analyses": "Analyses",
+    "trend": {
+      "bpmPerTest": "bpm/test"
+    },
+    "insight": {
+      "wellTrained": "Well trained",
+      "goodBase": "Good aerobic base",
+      "needsWork": "Aerobic base needs development"
+    },
+    "chart": {
+      "title": "Threshold development",
+      "aet": "AeT (bpm)",
+      "lt2": "LT2 (bpm)",
+      "method": "Method:",
+      "drift": "Drift:",
+      "temp": "Temp:",
+      "hrAxis": "Heart rate (bpm)"
+    },
+    "table": {
+      "day": "Date",
+      "file": "File",
+      "method": "Method",
+      "aet": "AeT",
+      "lt2": "LT2",
+      "drift": "Drift",
+      "dfa": "DFA α1",
+      "temp": "Temp",
+      "confidence": "Confidence"
+    },
+    "method": {
+      "drift": "Drift",
+      "dfa": "DFA α1",
+      "combined": "Combined",
+      "multi": "Multi-file"
+    },
+    "conf": {
+      "high": "High",
+      "medium": "Mod.",
+      "low": "Low"
+    },
+    "empty": {
+      "title": "No saved analyses yet",
+      "text": "Analyze an activity in single or multi-file view and save the result using the 'Save to history' button. Over time you'll see how your aerobic threshold develops."
+    },
+    "imported": "Imported {{count}} new entries.",
+    "importError": "Import error"
+  },
+  "multi": {
+    "back": "← Single analysis",
+    "heading": "Multi-activity analysis",
+    "desc": "Load multiple runs at different HR zones. The app finds at which heart rate drift exceeds 3.5% and estimates your aerobic threshold.",
+    "addFiles": "+ Add FIT files",
+    "gapModel": "GAP model",
+    "strava": "Strava",
+    "minetti": "Minetti",
+    "table": {
+      "day": "Date",
+      "file": "File",
+      "warmup": "Warmup",
+      "analyzed": "Analyzed",
+      "distance": "Distance",
+      "firstHR": "1st half HR",
+      "avgPace": "Avg pace",
+      "gapDrift": "GAP Drift",
+      "quality": "Quality",
+      "result": "Result"
+    },
+    "warmupBadge": "auto",
+    "warmupBadgeTitle": "Automatically detected from HR stabilization",
+    "editHint": "Click to edit analyzed section",
+    "badge": {
+      "below": "< AeT",
+      "at": "= AeT",
+      "above": "> AeT"
+    },
+    "threshold": {
+      "label": "Estimated aerobic threshold (AeT)",
+      "high": "High confidence",
+      "medium": "Moderate confidence",
+      "low": "Low confidence",
+      "hint": "Add more activities near the threshold zone for a better estimate."
+    },
+    "chart": {
+      "title": "HR vs. Drift — Aerobic threshold detection",
+      "activities": "Activities",
+      "threshold35": "AeT lower bound (3.5%)",
+      "threshold50": "AeT upper bound (5%)",
+      "aetLine": "AeT: {{hr}} bpm",
+      "tooltipHr": "HR: {{hr}} bpm | Drift: {{drift}}%",
+      "tooltipPace": "Pace: {{pace}} /km | {{date}}",
+      "xAxis": "1st half average HR (bpm)",
+      "yAxis": "GAP-compensated drift (%)"
+    },
+    "how": {
+      "title": "How does multi-activity analysis work?",
+      "step1": "Load 3–6 runs at different intensities (easy, moderate, brisk)",
+      "step2": "The app calculates GAP-compensated drift for each",
+      "step3": "The chart shows drift relative to heart rate",
+      "step4": "The app interpolates at which HR the 3.5% threshold is crossed = AeT",
+      "note": "Best results when activities are steady-state (no intervals), at least 40 min long, and at different HR zones."
+    },
+    "trim": {
+      "start": "Start:",
+      "end": "End:"
+    },
+    "errorInFile": "Error in file {{file}}: {{error}}"
+  },
+  "charts": {
+    "hrPace": {
+      "title": "Heart rate and GAP pace",
+      "hrLabel": "Heart rate (bpm)",
+      "paceLabel": "GAP pace (s/km)",
+      "hrTooltip": "HR: {{value}} bpm",
+      "gapTooltip": "GAP: {{value}} /km",
+      "hrAxis": "Heart rate (bpm)",
+      "paceAxis": "Pace (s/km)"
+    },
+    "elevation": {
+      "title": "Elevation and grade",
+      "elevLabel": "Elevation (m)",
+      "gradeLabel": "Grade (%)",
+      "elevTooltip": "Elevation: {{value}} m",
+      "gradeTooltip": "Grade: {{value}}%",
+      "elevAxis": "Elevation (m)",
+      "gradeAxis": "Grade (%)"
+    },
+    "ef": {
+      "title": "Efficiency Factor by segment",
+      "gapLabel": "EF (GAP-compensated)",
+      "rawLabel": "EF (raw)",
+      "segTooltipTitle": "Segment {{n}}: {{start}} - {{end}}",
+      "gapTooltip": "GAP EF",
+      "rawTooltip": "Raw EF",
+      "hrTooltip": "HR: {{value}} bpm",
+      "xAxis": "Segment",
+      "yAxis": "EF (×1000)"
+    },
+    "hrSeg": {
+      "title": "Heart rate by segment",
+      "label": "Avg HR (bpm)",
+      "xAxis": "Segment",
+      "yAxis": "Heart rate (bpm)"
+    }
+  }
+}

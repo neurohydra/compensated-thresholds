@@ -1,9 +1,9 @@
 import type { ActivitySummary } from './fitParser';
 import type { EnrichedRecord, GapModel } from './gapCalculator';
 import { enrichRecords } from './gapCalculator';
-import { filterRecords, analyzeDrift, speedToPace, formatDuration } from './driftAnalysis';
+import { filterRecords, analyzeDrift, speedToPace } from './driftAnalysis';
 import type { DriftResult } from './driftAnalysis';
-import { detectWarmupEnd, detectWarmupEndWithDiagnostics } from './warmupDetector';
+import { detectWarmupEndWithDiagnostics } from './warmupDetector';
 import type { WarmupDiagnostics } from './warmupDetector';
 import { assessDataQuality } from './dataQuality';
 import type { DataQualityReport } from './dataQuality';

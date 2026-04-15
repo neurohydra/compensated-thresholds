@@ -204,7 +204,7 @@ function extractFromRawBbi(mesgs: any[], startTimeMs: number): RRInterval[] {
   return intervals;
 }
 
-function extractFromHrv(mesgs: any[], startTimeMs: number): RRInterval[] {
+function extractFromHrv(mesgs: any[], _startTimeMs: number): RRInterval[] {
   const intervals: RRInterval[] = [];
   let cumulativeMs = 0;
 

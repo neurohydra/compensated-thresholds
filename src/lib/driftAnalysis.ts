@@ -144,7 +144,7 @@ export function analyzeDrift(records: EnrichedRecord[]): DriftResult {
   // Use GAP-compensated as the primary metric
   const decouplingPercent = gapDecouplingPercent;
 
-  const avgHR = (firstHalfAvgHR + secondHalfAvgHR) / 2;
+  void (firstHalfAvgHR + secondHalfAvgHR);
   const interpretation = interpret(decouplingPercent, firstHalfAvgHR);
 
   // Suggest AeT based on first half HR if drift is in the right range

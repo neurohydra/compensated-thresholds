@@ -1,4 +1,6 @@
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -19,21 +21,19 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, T
 
 interface DFAPanelProps {
   dfaResult: DFAResult;
-  /** Drift-based AeT for cross-validation */
   driftAeT: number | null;
 }
 
 export function DFAPanel({ dfaResult, driftAeT }: DFAPanelProps) {
+  const { t } = useTranslation();
+
   if (!dfaResult.isReliable && dfaResult.windows.length === 0) {
     return (
       <div className="dfa-panel">
-        <h2>DFA Alpha1 -analyysi</h2>
+        <h2>{t('dfa.heading')}</h2>
         <div className="dfa-no-data">
           <p>{dfaResult.quality.recommendation}</p>
-          <p className="text-muted">
-            DFA alpha1 vaatii RR-intervallidataa (beat-to-beat). Varmista että käytät
-            rintasensoria (esim. Polar H10, Garmin HRM-Pro) ja HRV-tallennus on päällä.
-          </p>
+          <p className="text-muted">{t('dfa.noData.hint')}</p>
         </div>
       </div>
     );
@@ -43,28 +43,27 @@ export function DFAPanel({ dfaResult, driftAeT }: DFAPanelProps) {
 
   return (
     <div className="dfa-panel">
-      <h2>DFA Alpha1 -analyysi</h2>
+      <h2>{t('dfa.heading')}</h2>
 
-      {/* Threshold estimates */}
       <div className="dfa-thresholds">
         {dfaResult.hrvt1 != null && (
           <div className="dfa-threshold-card dfa-aet">
-            <span className="label">HRVT1 (AeT)</span>
-            <span className="big-value">{dfaResult.hrvt1} <small>bpm</small></span>
-            <span className="sub">DFA α1 = 0.75</span>
+            <span className="label">{t('dfa.hrv1.label')}</span>
+            <span className="big-value">{dfaResult.hrvt1} <small>{t('common.bpm')}</small></span>
+            <span className="sub">{t('dfa.hrv1.sub')}</span>
           </div>
         )}
         {dfaResult.hrvt2 != null && (
           <div className="dfa-threshold-card dfa-lt">
-            <span className="label">HRVT2 (AnT/LT2)</span>
-            <span className="big-value">{dfaResult.hrvt2} <small>bpm</small></span>
-            <span className="sub">DFA α1 = 0.50</span>
+            <span className="label">{t('dfa.hrv2.label')}</span>
+            <span className="big-value">{dfaResult.hrvt2} <small>{t('common.bpm')}</small></span>
+            <span className="sub">{t('dfa.hrv2.sub')}</span>
           </div>
         )}
         {driftAeT != null && dfaResult.hrvt1 != null && (
           <div className="dfa-threshold-card dfa-compare">
-            <span className="label">Ristiin validointi</span>
-            <CrossValidation driftAeT={driftAeT} dfaAeT={dfaResult.hrvt1} />
+            <span className="label">{t('dfa.crossVal')}</span>
+            <CrossValidation driftAeT={driftAeT} dfaAeT={dfaResult.hrvt1} t={t} />
           </div>
         )}
       </div>
@@ -75,12 +74,10 @@ export function DFAPanel({ dfaResult, driftAeT }: DFAPanelProps) {
         </div>
       )}
 
-      {/* DFA alpha1 over time chart */}
       {validWindows.length >= 5 && (
         <DFATimeChart windows={dfaResult.windows} hrvt1Time={dfaResult.hrvt1Time} />
       )}
 
-      {/* DFA alpha1 vs HR chart */}
       {validWindows.length >= 5 && (
         <DFAvsHRChart
           windows={dfaResult.windows}
@@ -89,30 +86,22 @@ export function DFAPanel({ dfaResult, driftAeT }: DFAPanelProps) {
         />
       )}
 
-      {/* Quality info */}
       <div className="dfa-quality">
-        <h4>Datan laatu</h4>
+        <h4>{t('dfa.quality.heading')}</h4>
         <div className="dfa-quality-grid">
-          <div><span className="label">Sensori</span><span className="value">{sensorLabel(dfaResult.quality.sensorType)}</span></div>
-          <div><span className="label">Sykelyöntejä</span><span className="value">{dfaResult.quality.totalBeats.toLocaleString()}</span></div>
-          <div><span className="label">Validit ikkunat</span><span className="value">{dfaResult.quality.validWindows} / {dfaResult.quality.totalWindows}</span></div>
-          <div><span className="label">Keskim. artefaktit</span><span className="value">{dfaResult.quality.avgArtifactPercent.toFixed(1)}%</span></div>
+          <div><span className="label">{t('dfa.quality.sensor')}</span><span className="value">{sensorLabel(dfaResult.quality.sensorType, t)}</span></div>
+          <div><span className="label">{t('dfa.quality.beats')}</span><span className="value">{dfaResult.quality.totalBeats.toLocaleString()}</span></div>
+          <div><span className="label">{t('dfa.quality.validWindows')}</span><span className="value">{dfaResult.quality.validWindows} / {dfaResult.quality.totalWindows}</span></div>
+          <div><span className="label">{t('dfa.quality.avgArtifacts')}</span><span className="value">{dfaResult.quality.avgArtifactPercent.toFixed(1)}%</span></div>
         </div>
       </div>
     </div>
   );
 }
 
-function CrossValidation({ driftAeT, dfaAeT }: { driftAeT: number; dfaAeT: number }) {
+function CrossValidation({ driftAeT, dfaAeT, t }: { driftAeT: number; dfaAeT: number; t: TFunction }) {
   const diff = Math.abs(driftAeT - dfaAeT);
   const agreement = diff <= 3 ? 'excellent' : diff <= 6 ? 'good' : diff <= 10 ? 'fair' : 'poor';
-
-  const labels = {
-    excellent: 'Erinomainen yhteneväisyys',
-    good: 'Hyvä yhteneväisyys',
-    fair: 'Kohtalainen yhteneväisyys',
-    poor: 'Heikko yhteneväisyys',
-  };
 
   const classes = {
     excellent: 'cv-excellent',
@@ -123,25 +112,26 @@ function CrossValidation({ driftAeT, dfaAeT }: { driftAeT: number; dfaAeT: numbe
 
   return (
     <div className={`cross-validation ${classes[agreement]}`}>
-      <span className="cv-label">{labels[agreement]}</span>
+      <span className="cv-label">{t(`dfa.cv.${agreement}`)}</span>
       <span className="cv-detail">
-        Drifti: {driftAeT} bpm | DFA: {dfaAeT} bpm (ero: {diff} bpm)
+        {t('dfa.cv.detail', { drift: driftAeT, dfa: dfaAeT, diff })}
       </span>
     </div>
   );
 }
 
-function DFATimeChart({ windows, hrvt1Time }: {
+function DFATimeChart({ windows }: {
   windows: { elapsedSeconds: number; alpha1: number; isValid: boolean }[];
   hrvt1Time: number | null;
 }) {
+  const { t } = useTranslation();
   const valid = windows.filter(w => w.isValid && !isNaN(w.alpha1));
 
   const data = useMemo(() => ({
     labels: valid.map(w => formatDuration(w.elapsedSeconds)),
     datasets: [
       {
-        label: 'DFA α1',
+        label: t('dfa.chart.dfaLabel'),
         data: valid.map(w => w.alpha1),
         borderColor: '#8b5cf6',
         backgroundColor: 'rgba(139, 92, 246, 0.1)',
@@ -149,18 +139,16 @@ function DFATimeChart({ windows, hrvt1Time }: {
         pointRadius: 0,
         fill: true,
       },
-      // 0.75 threshold line
       {
-        label: 'HRVT1 (0.75)',
+        label: t('dfa.chart.hrvt1Label'),
         data: valid.map(() => 0.75),
         borderColor: 'rgba(16, 185, 129, 0.6)',
         borderWidth: 2,
         borderDash: [8, 4],
         pointRadius: 0,
       },
-      // 0.50 threshold line
       {
-        label: 'HRVT2 (0.50)',
+        label: t('dfa.chart.hrvt2Label'),
         data: valid.map(() => 0.50),
         borderColor: 'rgba(239, 68, 68, 0.6)',
         borderWidth: 2,
@@ -168,18 +156,18 @@ function DFATimeChart({ windows, hrvt1Time }: {
         pointRadius: 0,
       },
     ],
-  }), [valid]);
+  }), [valid, t]);
 
   const options: ChartOptions<'line'> = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      title: { display: true, text: 'DFA Alpha1 ajan funktiona', font: { size: 14 } },
+      title: { display: true, text: t('dfa.chart.timeTitle'), font: { size: 14 } },
       legend: { display: true, position: 'bottom' },
     },
     scales: {
       y: {
-        title: { display: true, text: 'DFA α1' },
+        title: { display: true, text: t('dfa.chart.dfaAxis') },
         min: 0,
         max: 1.5,
       },
@@ -198,15 +186,14 @@ function DFAvsHRChart({ windows, hrvt1, hrvt2 }: {
   hrvt1: number | null;
   hrvt2: number | null;
 }) {
+  const { t } = useTranslation();
   const valid = windows.filter(w => w.isValid && !isNaN(w.alpha1));
-
-  // Sort by HR for cleaner visualization
   const sorted = [...valid].sort((a, b) => a.heartRate - b.heartRate);
 
   const data = useMemo(() => {
     const datasets: any[] = [
       {
-        label: 'DFA α1 vs. syke',
+        label: t('dfa.chart.dfaLabel') + ' vs. ' + t('dfa.chart.hrAxis'),
         data: sorted.map(w => ({ x: w.heartRate, y: w.alpha1 })),
         borderColor: '#8b5cf6',
         backgroundColor: 'rgba(139, 92, 246, 0.3)',
@@ -218,9 +205,8 @@ function DFAvsHRChart({ windows, hrvt1, hrvt2 }: {
     const minHR = Math.min(...sorted.map(w => w.heartRate)) - 5;
     const maxHR = Math.max(...sorted.map(w => w.heartRate)) + 5;
 
-    // 0.75 line
     datasets.push({
-      label: 'AeT (α1=0.75)',
+      label: t('dfa.chart.aetLine'),
       data: [{ x: minHR, y: 0.75 }, { x: maxHR, y: 0.75 }],
       borderColor: 'rgba(16, 185, 129, 0.6)',
       borderWidth: 2,
@@ -229,9 +215,8 @@ function DFAvsHRChart({ windows, hrvt1, hrvt2 }: {
       showLine: true,
     });
 
-    // 0.50 line
     datasets.push({
-      label: 'AnT (α1=0.50)',
+      label: t('dfa.chart.antLine'),
       data: [{ x: minHR, y: 0.50 }, { x: maxHR, y: 0.50 }],
       borderColor: 'rgba(239, 68, 68, 0.6)',
       borderWidth: 2,
@@ -240,10 +225,9 @@ function DFAvsHRChart({ windows, hrvt1, hrvt2 }: {
       showLine: true,
     });
 
-    // HRVT1 vertical line
     if (hrvt1 != null) {
       datasets.push({
-        label: `HRVT1: ${hrvt1} bpm`,
+        label: t('dfa.chart.hrvt1Line', { hr: hrvt1 }),
         data: [{ x: hrvt1, y: 0 }, { x: hrvt1, y: 1.5 }],
         borderColor: 'rgba(16, 185, 129, 0.8)',
         borderWidth: 2,
@@ -255,7 +239,7 @@ function DFAvsHRChart({ windows, hrvt1, hrvt2 }: {
 
     if (hrvt2 != null) {
       datasets.push({
-        label: `HRVT2: ${hrvt2} bpm`,
+        label: t('dfa.chart.hrvt2Line', { hr: hrvt2 }),
         data: [{ x: hrvt2, y: 0 }, { x: hrvt2, y: 1.5 }],
         borderColor: 'rgba(239, 68, 68, 0.8)',
         borderWidth: 2,
@@ -266,18 +250,18 @@ function DFAvsHRChart({ windows, hrvt1, hrvt2 }: {
     }
 
     return { datasets };
-  }, [sorted, hrvt1, hrvt2]);
+  }, [sorted, hrvt1, hrvt2, t]);
 
   const options: ChartOptions<'scatter'> = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      title: { display: true, text: 'DFA Alpha1 vs. syke — kynnykset', font: { size: 14 } },
+      title: { display: true, text: t('dfa.chart.vsTitle'), font: { size: 14 } },
       legend: { display: true, position: 'bottom' },
     },
     scales: {
-      x: { title: { display: true, text: 'Syke (bpm)' }, type: 'linear' },
-      y: { title: { display: true, text: 'DFA α1' }, min: 0, max: 1.5 },
+      x: { title: { display: true, text: t('dfa.chart.hrAxis') }, type: 'linear' },
+      y: { title: { display: true, text: t('dfa.chart.dfaAxis') }, min: 0, max: 1.5 },
     },
   };
 
@@ -288,10 +272,10 @@ function DFAvsHRChart({ windows, hrvt1, hrvt2 }: {
   );
 }
 
-function sensorLabel(type: string): string {
+function sensorLabel(type: string, t: TFunction): string {
   switch (type) {
-    case 'chest-strap': return 'Rintasensori (hyvä)';
-    case 'optical': return 'Optinen (ei riitä DFA:lle)';
-    default: return 'Tuntematon';
+    case 'chest-strap': return t('dfa.sensor.chest');
+    case 'optical': return t('dfa.sensor.optical');
+    default: return t('dfa.sensor.unknown');
   }
 }

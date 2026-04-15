@@ -45,36 +45,6 @@ export interface EnrichedRecord extends ActivityRecord {
   elapsedSeconds: number;
 }
 
-/**
- * Calculate grade between consecutive points using altitude and distance.
- */
-function calculateGrades(records: ActivityRecord[]): number[] {
-  const grades: number[] = [0]; // first point has no grade
-
-  for (let i = 1; i < records.length; i++) {
-    const prev = records[i - 1];
-    const curr = records[i];
-
-    if (prev.altitude != null && curr.altitude != null && prev.distance != null && curr.distance != null) {
-      const dDist = curr.distance - prev.distance;
-      const dAlt = curr.altitude - prev.altitude;
-
-      if (dDist > 0.5) { // minimum 0.5m to avoid noise
-        // Use actual distance traveled, not horizontal distance
-        // grade = rise / run (horizontal), but we have slope distance
-        // horizontal = sqrt(slope^2 - rise^2), but for small grades: horizontal ≈ slope distance
-        const horizontal = Math.sqrt(Math.max(0, dDist * dDist - dAlt * dAlt));
-        grades.push(horizontal > 0.1 ? dAlt / horizontal : 0);
-      } else {
-        grades.push(grades[grades.length - 1] || 0);
-      }
-    } else {
-      grades.push(0);
-    }
-  }
-
-  return grades;
-}
 
 /**
  * Smooth altitude data using a moving average to reduce GPS noise.

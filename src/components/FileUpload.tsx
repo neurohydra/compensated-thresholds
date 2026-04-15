@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface FileUploadProps {
   onFileLoaded: (buffer: ArrayBuffer, fileName: string) => void;
@@ -6,6 +7,8 @@ interface FileUploadProps {
 }
 
 export function FileUpload({ onFileLoaded, loading }: FileUploadProps) {
+  const { t } = useTranslation();
+
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     const file = e.dataTransfer.files[0];
@@ -39,9 +42,9 @@ export function FileUpload({ onFileLoaded, loading }: FileUploadProps) {
           <polyline points="17 8 12 3 7 8" />
           <line x1="12" y1="3" x2="12" y2="15" />
         </svg>
-        <h2>Lataa FIT-tiedosto</h2>
-        <p>Vedä ja pudota .FIT-tiedosto tähän tai klikkaa valitaksesi</p>
-        <p className="hint">Vie tiedosto Garmin Connectista: Aktiviteetti → ⚙️ → Vie alkuperäinen</p>
+        <h2>{t('upload.title')}</h2>
+        <p>{t('upload.instruction')}</p>
+        <p className="hint">{t('upload.hint')}</p>
         <input
           type="file"
           accept=".fit,.FIT"

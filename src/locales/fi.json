@@ -1,0 +1,406 @@
+{
+  "common": {
+    "back": "← Takaisin",
+    "bpm": "bpm",
+    "notAvailable": "Ei saatavilla",
+    "available": "Saatavilla",
+    "delete": "Poista",
+    "ok": "OK",
+    "cancel": "Peruuta",
+    "dateLocale": "fi-FI",
+    "drift": "Drifti",
+    "quality": "Laatu"
+  },
+  "app": {
+    "title": "Compensated Thresholds",
+    "subtitle": "Aerobisen kynnyksen analyysi maastojuoksulle",
+    "single": {
+      "title": "Yksittäinen suoritus",
+      "desc": "Analysoi yksi juoksu ja laske drifti"
+    },
+    "multi": {
+      "title": "Monta suoritusta",
+      "desc": "Lataa useita juoksuja ja etsi kynnys automaattisesti",
+      "open": "Avaa monen suorituksen analyysi →"
+    },
+    "history": {
+      "title": "Seuranta",
+      "desc": "Näe aerobisen kynnyksen kehitys ajan yli",
+      "open": "Avaa historia →"
+    },
+    "how": {
+      "title": "Miten tämä toimii?",
+      "singleTitle": "Yksittäinen suoritus:",
+      "single": "Lataa yksi FIT-tiedosto — sovellus laskee GAP-kompensoidun driftin ja DFA alpha1 -analyysin (jos HRV-data saatavilla)",
+      "multiTitle": "Monta suoritusta:",
+      "multi": "Lataa 3–6 juoksua eri sykealueilta → automaattinen kynnyksen haku",
+      "historyTitle": "Seuranta:",
+      "history": "Tallenna tulokset ja seuraa AeT:n kehitystä harjoittelun edetessä",
+      "methodsTitle": "Kaksi itsenäistä menetelmää:",
+      "methods": "HR-drifti (Pa:Hr decoupling) ja DFA alpha1 (HRV-pohjainen). Kun molemmat ovat saatavilla, ne ristiin validoivat toisensa."
+    },
+    "save": "Tallenna historiaan",
+    "saved": "✓ Tallennettu",
+    "noHrv": {
+      "title": "DFA Alpha1 ei saatavilla",
+      "text": "Tiedostossa ei ole RR-intervallidataa. DFA alpha1 -analyysi vaatii rintasensorin (Polar H10, Garmin HRM-Pro) joka tallentaa beat-to-beat -datan. Ota HRV-tallennus käyttöön kellossasi."
+    },
+    "tooFewPoints": "Liian vähän datapisteitä valitulla aikavälillä. Laajenna analysoitavaa osuutta.",
+    "unknownError": "Tuntematon virhe",
+    "footer": "Perustuu <uphill>Uphill Athlete</uphill> -metodiin, <tp>TrainingPeaks</tp> Pa:Hr-analyysiin ja <rogers>Rogers et al. (2021)</rogers> DFA alpha1 -tutkimukseen."
+  },
+  "upload": {
+    "title": "Lataa FIT-tiedosto",
+    "instruction": "Vedä ja pudota .FIT-tiedosto tähän tai klikkaa valitaksesi",
+    "hint": "Vie tiedosto Garmin Connectista: Aktiviteetti → ⚙️ → Vie alkuperäinen"
+  },
+  "activity": {
+    "heading": "Aktiviteetti",
+    "sport": "Laji",
+    "date": "Päivämäärä",
+    "distance": "Matka",
+    "duration": "Kesto",
+    "avgHr": "Kesk. syke",
+    "avgPace": "Kesk. vauhti",
+    "temperature": "Lämpötila",
+    "hrvData": "HRV-data",
+    "beats": "lyöntiä",
+    "runningPower": "Juoksuteho",
+    "dataPoints": "Datapisteitä"
+  },
+  "trim": {
+    "heading": "Analyysiasetukset",
+    "hrRange": "Sykealue:",
+    "zoom": {
+      "auto": "Auto",
+      "tight": "Tiukka",
+      "full": "Koko",
+      "custom": "Oma",
+      "autoTitle": "Automaattinen: analysoitavan alueen sykkeet ±5 bpm",
+      "tightTitle": "Tiukka: analysoitavan alueen sykkeet tiiviisti",
+      "fullTitle": "Koko: kaikki sykearvot mukaan",
+      "customTitle": "Oma: säädä min/max itse",
+      "min": "Min",
+      "max": "Max",
+      "bpmRange": "{{range}} bpm alue"
+    },
+    "chart": {
+      "hrLabel": "Syke (bpm)",
+      "hrTooltip": "Syke: {{value}} bpm",
+      "warmup": "LÄMMITTELY",
+      "analyzed": "ANALYSOITAVA OSUUS"
+    },
+    "startLabel": "Aloitusaika (lämmittely pois)",
+    "endLabel": "Lopetusaika",
+    "analyzedDuration": "Analysoitava kesto:",
+    "minRecommended": "(suositellaan vähintään 40 min)",
+    "gapModel": "GAP-malli",
+    "gapStrava": "Strava (suositeltu)",
+    "gapMinetti": "Minetti (2002)",
+    "segments": "Segmenttejä"
+  },
+  "drift": {
+    "heading": "Driftianalyysi",
+    "gapDrift": "GAP-kompensoitu drifti:",
+    "suggestedAeT": "Arvioitu aerobinen kynnys (AeT):",
+    "temp": {
+      "heading": "Lämpötilakompensaatio",
+      "temperature": "Lämpötila",
+      "effect": "Lämpövaikutus",
+      "compensated": "Kompensoitu drifti",
+      "noEffect": "ei merkittävää lämpökompensaatiota tarvittu."
+    },
+    "comparison": {
+      "heading": "Puoliskojen vertailu",
+      "first": "1. puolisko",
+      "second": "2. puolisko",
+      "change": "Muutos",
+      "hr": "Syke (bpm)",
+      "pace": "Vauhti",
+      "gapPace": "GAP-vauhti",
+      "efRaw": "EF (raaka)",
+      "efGap": "EF (GAP)",
+      "driftPrefix": "Drifti:"
+    },
+    "note": {
+      "duration": "Analysoitu kesto:",
+      "explanation": "EF (Efficiency Factor) = nopeus / syke. Kun EF laskee toisessa puoliskossa, syke on \"driftannut\" ylöspäin suhteessa vauhtiin. GAP-kompensoitu arvo huomioi maastonmuodot, joten mäkien vaikutus on normalisoitu."
+    }
+  },
+  "dfa": {
+    "heading": "DFA Alpha1 -analyysi",
+    "noData": {
+      "hint": "DFA alpha1 vaatii RR-intervallidataa (beat-to-beat). Varmista että käytät rintasensoria (esim. Polar H10, Garmin HRM-Pro) ja HRV-tallennus on päällä."
+    },
+    "hrv1": {
+      "label": "HRVT1 (AeT)",
+      "sub": "DFA α1 = 0.75"
+    },
+    "hrv2": {
+      "label": "HRVT2 (AnT/LT2)",
+      "sub": "DFA α1 = 0.50"
+    },
+    "crossVal": "Ristiin validointi",
+    "chart": {
+      "timeTitle": "DFA Alpha1 ajan funktiona",
+      "dfaLabel": "DFA α1",
+      "hrvt1Label": "HRVT1 (0.75)",
+      "hrvt2Label": "HRVT2 (0.50)",
+      "vsTitle": "DFA Alpha1 vs. syke — kynnykset",
+      "hrAxis": "Syke (bpm)",
+      "dfaAxis": "DFA α1",
+      "aetLine": "AeT (α1=0.75)",
+      "antLine": "AnT (α1=0.50)",
+      "hrvt1Line": "HRVT1: {{hr}} bpm",
+      "hrvt2Line": "HRVT2: {{hr}} bpm"
+    },
+    "quality": {
+      "heading": "Datan laatu",
+      "sensor": "Sensori",
+      "beats": "Sykelyöntejä",
+      "validWindows": "Validit ikkunat",
+      "avgArtifacts": "Keskim. artefaktit"
+    },
+    "sensor": {
+      "chest": "Rintasensori (hyvä)",
+      "optical": "Optinen (ei riitä DFA:lle)",
+      "unknown": "Tuntematon"
+    },
+    "cv": {
+      "excellent": "Erinomainen yhteneväisyys",
+      "good": "Hyvä yhteneväisyys",
+      "fair": "Kohtalainen yhteneväisyys",
+      "poor": "Heikko yhteneväisyys",
+      "detail": "Drifti: {{drift}} bpm | DFA: {{dfa}} bpm (ero: {{diff}} bpm)"
+    }
+  },
+  "diagnostics": {
+    "status": {
+      "good": "Luotettava analyysi",
+      "acceptable": "Kohtalainen luotettavuus",
+      "poor": "Heikko luotettavuus"
+    },
+    "heading": "Analyysin luotettavuus",
+    "toggle": {
+      "show": "▼ Näytä tiedot",
+      "hide": "▲ Piilota"
+    },
+    "qs": {
+      "quality": "Datan laatu",
+      "robustness": "Tulosten robustius",
+      "warmup": "Lämmittelytunnistus",
+      "ci": "90% luottamusväli"
+    },
+    "quality": {
+      "heading": "Datan laatu",
+      "removed": "Poistettu {{count}} epäloogista datapistettä."
+    },
+    "warmup": {
+      "heading": "Lämmittelytunnistus",
+      "method": "Menetelmä",
+      "confidence": "Luottamus",
+      "cutoff": "Leikkauspiste",
+      "hrAtCutoff": "Syke leikkauspisteessä",
+      "chart": {
+        "title": "Lämmittelytunnistuksen signaalit",
+        "hrLabel": "Syke (bpm)",
+        "stabilityLabel": "Stabiilius",
+        "hrAxis": "Syke (bpm)",
+        "stabilityAxis": "Stabiilius (pienempi = vakaampi)"
+      },
+      "methods": {
+        "hrPace": "Syke + vauhti (yhdistetty)",
+        "hrOnly": "Pelkkä syke",
+        "fallback": "Varamenetelmä"
+      },
+      "conf": {
+        "high": "Korkea",
+        "medium": "Kohtalainen",
+        "low": "Matala"
+      }
+    },
+    "sens": {
+      "warmupTitle": "Herkkyysanalyysi: Lämmittelyleikkaus",
+      "warmupNote": "Kuinka paljon driftitulos muuttuu eri lämmittelyleikkauspisteillä. Vakaa kuvaaja = robusti tulos.",
+      "warmupXAxis": "Lämmittelyleikkaus",
+      "warmupYAxis": "Drifti (%)",
+      "warmupTooltip": "Drifti: {{drift}}% | Analysoitu: {{minutes}} min",
+      "gapTitle": "GAP-mallien vertailu",
+      "gapNote": {
+        "significant": "Mallien välinen ero: {{diff}}%-yksikköä. Maasto vaikuttaa tulokseen merkittävästi.",
+        "minor": "Mallien välinen ero: {{diff}}%-yksikköä. Vähäinen ero — maasto ei juuri vaikuta."
+      },
+      "gapXAxis": "Drifti (%)",
+      "splitTitle": "Herkkyysanalyysi: Jakopiste",
+      "splitNote": "Kuinka paljon driftitulos muuttuu kun puoliskojen jakopistettä siirretään. 50% = standardi puoliksi jako.",
+      "splitXAxis": "1. puoliskon osuus",
+      "splitYAxis": "Drifti (%)",
+      "ciTitle": "Bootstrap-luottamusväli (90%)"
+    },
+    "models": {
+      "raw": "Raaka (ei GAP)",
+      "strava": "Strava GAP",
+      "minetti": "Minetti GAP"
+    },
+    "ci": {
+      "tooFew": "Liian vähän dataa bootstrap-analyysiin.",
+      "p5": "5%: {{value}}%",
+      "median": "Mediaani: {{value}}%",
+      "p95": "95%: {{value}}%",
+      "warningAeT": "⚠ Luottamusväli ylittää 3.5% rajan — AeT-arvio on epävarma.",
+      "warningLT": "⚠ Luottamusväli ylittää 5% rajan — tulkinta voi vaihdella."
+    },
+    "summary": "Yhteenveto:"
+  },
+  "history": {
+    "heading": "Kynnysarvojen seuranta",
+    "export": "Vie JSON",
+    "import": "Tuo JSON",
+    "latestAeT": "Viimeisin AeT",
+    "latestLT2": "Viimeisin LT2",
+    "aetLt2": "AeT / LT2",
+    "analyses": "Analyysejä",
+    "trend": {
+      "bpmPerTest": "bpm/testi"
+    },
+    "insight": {
+      "wellTrained": "Hyvin harjoiteltu",
+      "goodBase": "Hyvä aerobinen pohja",
+      "needsWork": "Kehitettävää aerobisessa pohjassa"
+    },
+    "chart": {
+      "title": "Kynnysarvojen kehitys",
+      "aet": "AeT (bpm)",
+      "lt2": "LT2 (bpm)",
+      "method": "Menetelmä:",
+      "drift": "Drifti:",
+      "temp": "Lämpö:",
+      "hrAxis": "Syke (bpm)"
+    },
+    "table": {
+      "day": "Päivä",
+      "file": "Tiedosto",
+      "method": "Menetelmä",
+      "aet": "AeT",
+      "lt2": "LT2",
+      "drift": "Drifti",
+      "dfa": "DFA α1",
+      "temp": "Lämpö",
+      "confidence": "Luottamus"
+    },
+    "method": {
+      "drift": "Drifti",
+      "dfa": "DFA α1",
+      "combined": "Yhdistetty",
+      "multi": "Moni-tiedosto"
+    },
+    "conf": {
+      "high": "Korkea",
+      "medium": "Kohtal.",
+      "low": "Matala"
+    },
+    "empty": {
+      "title": "Ei vielä tallennettuja analyysejä",
+      "text": "Analysoi suoritus yksittäisen tai monen tiedoston näkymässä ja tallenna tulos \"Tallenna historiaan\" -painikkeella. Ajan myötä näet kuinka aerobinen kynnyksesi kehittyy."
+    },
+    "imported": "Tuotu {{count}} uutta merkintää.",
+    "importError": "Virhe tuonnissa"
+  },
+  "multi": {
+    "back": "← Yksittäinen analyysi",
+    "heading": "Monen suorituksen analyysi",
+    "desc": "Lataa useita juoksuja eri sykealueilta. Sovellus etsii missä sykkeessä drifti ylittää 3.5% rajan ja ehdottaa aerobista kynnystäsi.",
+    "addFiles": "+ Lisää FIT-tiedostoja",
+    "gapModel": "GAP-malli",
+    "strava": "Strava",
+    "minetti": "Minetti",
+    "table": {
+      "day": "Päivä",
+      "file": "Tiedosto",
+      "warmup": "Lämmittely",
+      "analyzed": "Analysoitu",
+      "distance": "Matka",
+      "firstHR": "1. puolisko HR",
+      "avgPace": "Kesk. vauhti",
+      "gapDrift": "GAP Drifti",
+      "quality": "Laatu",
+      "result": "Tulos"
+    },
+    "warmupBadge": "auto",
+    "warmupBadgeTitle": "Automaattisesti tunnistettu sykkeen tasaantumisesta",
+    "editHint": "Klikkaa muokataksesi analysoitavaa aluetta",
+    "badge": {
+      "below": "< AeT",
+      "at": "= AeT",
+      "above": "> AeT"
+    },
+    "threshold": {
+      "label": "Arvioitu aerobinen kynnys (AeT)",
+      "high": "Korkea luottamus",
+      "medium": "Kohtalainen luottamus",
+      "low": "Matala luottamus",
+      "hint": "Lisää suorituksia lähempänä kynnysaluetta paremman arvion saamiseksi."
+    },
+    "chart": {
+      "title": "Syke vs. Drifti — Aerobisen kynnyksen haku",
+      "activities": "Suoritukset",
+      "threshold35": "AeT alaraja (3.5%)",
+      "threshold50": "AeT yläraja (5%)",
+      "aetLine": "AeT: {{hr}} bpm",
+      "tooltipHr": "HR: {{hr}} bpm | Drifti: {{drift}}%",
+      "tooltipPace": "Vauhti: {{pace}} /km | {{date}}",
+      "xAxis": "1. puoliskon keskisyke (bpm)",
+      "yAxis": "GAP-kompensoitu drifti (%)"
+    },
+    "how": {
+      "title": "Miten monen suorituksen analyysi toimii?",
+      "step1": "Lataa 3–6 juoksua eri intensiteeteillä (helppo, kohtalainen, reipas)",
+      "step2": "Sovellus laskee GAP-kompensoidun driftin jokaiselle",
+      "step3": "Kuvaaja näyttää driftin suhteessa sykkeeseen",
+      "step4": "Sovellus interpoloi missä sykkeessä 3.5% raja ylittyy = AeT",
+      "note": "Paras tulos saadaan kun suoritukset ovat tasavauhtisia (ei intervalleja), vähintään 40 min pitkiä, ja eri sykealueilla."
+    },
+    "trim": {
+      "start": "Alku:",
+      "end": "Loppu:"
+    },
+    "errorInFile": "Virhe tiedostossa {{file}}: {{error}}"
+  },
+  "charts": {
+    "hrPace": {
+      "title": "Syke ja GAP-vauhti",
+      "hrLabel": "Syke (bpm)",
+      "paceLabel": "GAP-vauhti (s/km)",
+      "hrTooltip": "Syke: {{value}} bpm",
+      "gapTooltip": "GAP: {{value}} /km",
+      "hrAxis": "Syke (bpm)",
+      "paceAxis": "Vauhti (s/km)"
+    },
+    "elevation": {
+      "title": "Korkeus ja kaltevuus",
+      "elevLabel": "Korkeus (m)",
+      "gradeLabel": "Kaltevuus (%)",
+      "elevTooltip": "Korkeus: {{value}} m",
+      "gradeTooltip": "Kaltevuus: {{value}}%",
+      "elevAxis": "Korkeus (m)",
+      "gradeAxis": "Kaltevuus (%)"
+    },
+    "ef": {
+      "title": "Efficiency Factor segmenteittäin",
+      "gapLabel": "EF (GAP-kompensoitu)",
+      "rawLabel": "EF (raaka)",
+      "segTooltipTitle": "Segmentti {{n}}: {{start}} - {{end}}",
+      "gapTooltip": "GAP EF",
+      "rawTooltip": "Raw EF",
+      "hrTooltip": "HR: {{value}} bpm",
+      "xAxis": "Segmentti",
+      "yAxis": "EF (×1000)"
+    },
+    "hrSeg": {
+      "title": "Syke segmenteittäin",
+      "label": "Kesk. syke (bpm)",
+      "xAxis": "Segmentti",
+      "yAxis": "Syke (bpm)"
+    }
+  }
+}

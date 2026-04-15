@@ -1,4 +1,5 @@
 import { useMemo, useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -33,14 +34,12 @@ interface TrimSelectorProps {
 
 type ZoomMode = 'auto' | 'selected' | 'full' | 'custom';
 
-/** Downsample records for the chart (max ~300 points) */
 function downsampleForChart(records: EnrichedRecord[], maxPoints: number = 300): EnrichedRecord[] {
   if (records.length <= maxPoints) return records;
   const step = Math.ceil(records.length / maxPoints);
   return records.filter((_, i) => i % step === 0);
 }
 
-/** Calculate percentile-based bounds from HR array */
 function calcBounds(hrs: number[], padding: number = 3): { min: number; max: number } {
   if (hrs.length === 0) return { min: 60, max: 200 };
   const sorted = [...hrs].sort((a, b) => a - b);
@@ -64,6 +63,7 @@ export function TrimSelector({
   onNumSegmentsChange,
   records,
 }: TrimSelectorProps) {
+  const { t } = useTranslation();
   const analyzedDuration = trimEnd - trimStart;
 
   const downsampled = useMemo(
@@ -83,7 +83,6 @@ export function TrimSelector({
     return idx === -1 ? downsampled.length - 1 : idx;
   }, [downsampled, trimEnd]);
 
-  // Precomputed bounds for different zoom modes
   const allHrs = useMemo(
     () => downsampled.map(r => r.heartRate).filter((h): h is number => h != null && h > 40),
     [downsampled],
@@ -98,14 +97,12 @@ export function TrimSelector({
 
   const boundsAll = useMemo(() => calcBounds(allHrs, 5), [allHrs]);
   const boundsSelected = useMemo(() => calcBounds(selectedHrs, 3), [selectedHrs]);
-  // "Auto" = selected area bounds but with slightly more room
   const boundsAuto = useMemo(() => calcBounds(selectedHrs, 5), [selectedHrs]);
 
   const [zoomMode, setZoomMode] = useState<ZoomMode>('auto');
   const [customMin, setCustomMin] = useState(boundsAuto.min);
   const [customMax, setCustomMax] = useState(boundsAuto.max);
 
-  // Update custom bounds when auto bounds change (on file load / trim change)
   useEffect(() => {
     if (zoomMode !== 'custom') {
       setCustomMin(boundsAuto.min);
@@ -131,7 +128,7 @@ export function TrimSelector({
       labels,
       datasets: [
         {
-          label: 'Syke (bpm)',
+          label: t('trim.chart.hrLabel'),
           data: hrData,
           borderWidth: 1.5,
           pointRadius: 0,
@@ -154,9 +151,11 @@ export function TrimSelector({
         },
       ],
     };
-  }, [downsampled, trimStartIdx, trimEndIdx]);
+  }, [downsampled, trimStartIdx, trimEndIdx, t]);
 
-  // Custom plugin to draw selection overlay
+  const warmupLabel = t('trim.chart.warmup');
+  const analyzedLabel = t('trim.chart.analyzed');
+
   const selectionPlugin: Plugin<'line'> = useMemo(() => ({
     id: 'selectionOverlay',
     afterDraw(chart) {
@@ -175,12 +174,10 @@ export function TrimSelector({
 
       ctx.save();
 
-      // Dim outside regions
       ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
       ctx.fillRect(chartArea.left, chartArea.top, startPixel - chartArea.left, chartArea.height);
       ctx.fillRect(endPixel, chartArea.top, chartArea.right - endPixel, chartArea.height);
 
-      // Selection boundary lines
       ctx.strokeStyle = 'rgba(59, 130, 246, 0.8)';
       ctx.lineWidth = 2;
       ctx.setLineDash([6, 4]);
@@ -195,22 +192,23 @@ export function TrimSelector({
       ctx.lineTo(endPixel, chartArea.bottom);
       ctx.stroke();
 
-      // Labels
       ctx.setLineDash([]);
       ctx.font = 'bold 11px sans-serif';
       ctx.textAlign = 'center';
 
       if (startPixel - chartArea.left > 60) {
         ctx.fillStyle = 'rgba(148, 163, 184, 0.6)';
-        ctx.fillText('LÄMMITTELY', (chartArea.left + startPixel) / 2, chartArea.top + 16);
+        ctx.fillText(warmupLabel, (chartArea.left + startPixel) / 2, chartArea.top + 16);
       }
 
       ctx.fillStyle = 'rgba(239, 68, 68, 0.8)';
-      ctx.fillText('ANALYSOITAVA OSUUS', (startPixel + endPixel) / 2, chartArea.top + 16);
+      ctx.fillText(analyzedLabel, (startPixel + endPixel) / 2, chartArea.top + 16);
 
       ctx.restore();
     },
-  }), [trimStartIdx, trimEndIdx]);
+  }), [trimStartIdx, trimEndIdx, warmupLabel, analyzedLabel]);
+
+  const hrTooltipLabel = t('trim.chart.hrTooltip', { value: '{{value}}' });
 
   const chartOptions: ChartOptions<'line'> = useMemo(() => ({
     responsive: true,
@@ -223,7 +221,7 @@ export function TrimSelector({
       tooltip: {
         callbacks: {
           title: (items) => items[0]?.label ?? '',
-          label: (ctx) => `Syke: ${ctx.parsed.y} bpm`,
+          label: (ctx) => t('trim.chart.hrTooltip', { value: ctx.parsed.y }),
         },
       },
     },
@@ -250,14 +248,15 @@ export function TrimSelector({
         grid: { color: 'rgba(148, 163, 184, 0.08)' },
       },
     },
-  }), [hrMin, hrMax]);
+  }), [hrMin, hrMax, t]);
+
+  void hrTooltipLabel; // used via t() in chartOptions
 
   return (
     <div className="trim-selector">
-      <h3>Analyysiasetukset</h3>
+      <h3>{t('trim.heading')}</h3>
 
       <div className="trim-controls">
-        {/* Chart with zoom controls */}
         <div className="trim-chart-wrapper">
           <div className="trim-chart-container">
             {downsampled.length > 0 && (
@@ -265,44 +264,43 @@ export function TrimSelector({
             )}
           </div>
 
-          {/* Zoom controls */}
           <div className="zoom-controls">
-            <span className="zoom-label">Sykealue:</span>
+            <span className="zoom-label">{t('trim.hrRange')}</span>
             <div className="zoom-buttons">
               <button
                 className={`zoom-btn ${zoomMode === 'auto' ? 'active' : ''}`}
                 onClick={() => setZoomMode('auto')}
-                title="Automaattinen: analysoitavan alueen sykkeet ±5 bpm"
+                title={t('trim.zoom.autoTitle')}
               >
-                Auto
+                {t('trim.zoom.auto')}
               </button>
               <button
                 className={`zoom-btn ${zoomMode === 'selected' ? 'active' : ''}`}
                 onClick={() => setZoomMode('selected')}
-                title="Tiukka: analysoitavan alueen sykkeet tiiviisti"
+                title={t('trim.zoom.tightTitle')}
               >
-                Tiukka
+                {t('trim.zoom.tight')}
               </button>
               <button
                 className={`zoom-btn ${zoomMode === 'full' ? 'active' : ''}`}
                 onClick={() => setZoomMode('full')}
-                title="Koko: kaikki sykearvot mukaan"
+                title={t('trim.zoom.fullTitle')}
               >
-                Koko
+                {t('trim.zoom.full')}
               </button>
               <button
                 className={`zoom-btn ${zoomMode === 'custom' ? 'active' : ''}`}
                 onClick={() => setZoomMode('custom')}
-                title="Oma: säädä min/max itse"
+                title={t('trim.zoom.customTitle')}
               >
-                Oma
+                {t('trim.zoom.custom')}
               </button>
             </div>
 
             {zoomMode === 'custom' && (
               <div className="zoom-custom">
                 <div className="zoom-input-group">
-                  <label>Min</label>
+                  <label>{t('trim.zoom.min')}</label>
                   <input
                     type="number"
                     value={customMin}
@@ -314,7 +312,7 @@ export function TrimSelector({
                 </div>
                 <span className="zoom-dash">–</span>
                 <div className="zoom-input-group">
-                  <label>Max</label>
+                  <label>{t('trim.zoom.max')}</label>
                   <input
                     type="number"
                     value={customMax}
@@ -324,7 +322,7 @@ export function TrimSelector({
                     step={5}
                   />
                 </div>
-                <span className="zoom-range-info">{customMax - customMin} bpm alue</span>
+                <span className="zoom-range-info">{t('trim.zoom.bpmRange', { range: customMax - customMin })}</span>
               </div>
             )}
 
@@ -334,7 +332,7 @@ export function TrimSelector({
 
         <div className="trim-group">
           <label>
-            Aloitusaika (lämmittely pois)
+            {t('trim.startLabel')}
             <span className="trim-value">{formatDuration(trimStart)}</span>
           </label>
           <input
@@ -349,7 +347,7 @@ export function TrimSelector({
 
         <div className="trim-group">
           <label>
-            Lopetusaika
+            {t('trim.endLabel')}
             <span className="trim-value">{formatDuration(trimEnd)}</span>
           </label>
           <input
@@ -363,24 +361,24 @@ export function TrimSelector({
         </div>
 
         <div className="trim-info">
-          Analysoitava kesto: <strong>{formatDuration(analyzedDuration)}</strong>
+          {t('trim.analyzedDuration')} <strong>{formatDuration(analyzedDuration)}</strong>
           {analyzedDuration < 2400 && (
-            <span className="warning"> (suositellaan vähintään 40 min)</span>
+            <span className="warning"> {t('trim.minRecommended')}</span>
           )}
         </div>
       </div>
 
       <div className="settings-row">
         <div className="setting">
-          <label>GAP-malli</label>
+          <label>{t('trim.gapModel')}</label>
           <select value={gapModel} onChange={e => onGapModelChange(e.target.value as GapModel)}>
-            <option value="strava">Strava (suositeltu)</option>
-            <option value="minetti">Minetti (2002)</option>
+            <option value="strava">{t('trim.gapStrava')}</option>
+            <option value="minetti">{t('trim.gapMinetti')}</option>
           </select>
         </div>
 
         <div className="setting">
-          <label>Segmenttejä</label>
+          <label>{t('trim.segments')}</label>
           <select value={numSegments} onChange={e => onNumSegmentsChange(Number(e.target.value))}>
             <option value={6}>6</option>
             <option value={8}>8</option>

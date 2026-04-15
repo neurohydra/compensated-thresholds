@@ -1,4 +1,6 @@
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -28,39 +30,34 @@ interface DiagnosticsPanelProps {
 }
 
 export function DiagnosticsPanel({ quality, sensitivity, warmup, trimStart }: DiagnosticsPanelProps) {
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
 
-  // Overall status
   const overallScore = sensitivity
     ? Math.round((quality.score + sensitivity.robustnessScore) / 2)
     : quality.score;
   const overallLevel = overallScore >= 75 ? 'good' : overallScore >= 50 ? 'acceptable' : 'poor';
-  const overallLabel = {
-    good: 'Luotettava analyysi',
-    acceptable: 'Kohtalainen luotettavuus',
-    poor: 'Heikko luotettavuus',
-  }[overallLevel];
+  const overallLabel = t(`diagnostics.status.${overallLevel}`);
 
   return (
     <div className="diagnostics-panel">
       <div className="diag-header" onClick={() => setExpanded(!expanded)}>
         <div className="diag-header-left">
-          <h3>Analyysin luotettavuus</h3>
+          <h3>{t('diagnostics.heading')}</h3>
           <ScoreBadge score={overallScore} label={overallLabel} />
         </div>
         <div className="diag-header-right">
-          <span className="diag-toggle">{expanded ? '▲ Piilota' : '▼ Näytä tiedot'}</span>
+          <span className="diag-toggle">{expanded ? t('diagnostics.toggle.hide') : t('diagnostics.toggle.show')}</span>
         </div>
       </div>
 
-      {/* Quick summary always visible */}
       <div className="diag-quick">
-        <QuickStat label="Datan laatu" score={quality.score} />
-        <QuickStat label="Tulosten robustius" score={sensitivity?.robustnessScore ?? null} />
-        <QuickStat label="Lämmittelytunnistus" score={warmupConfidenceScore(warmup)} />
+        <QuickStat label={t('diagnostics.qs.quality')} score={quality.score} />
+        <QuickStat label={t('diagnostics.qs.robustness')} score={sensitivity?.robustnessScore ?? null} />
+        <QuickStat label={t('diagnostics.qs.warmup')} score={warmupConfidenceScore(warmup)} />
         {sensitivity && (
           <QuickStat
-            label="90% luottamusväli"
+            label={t('diagnostics.qs.ci')}
             text={`${sensitivity.confidenceInterval.lower.toFixed(1)}–${sensitivity.confidenceInterval.upper.toFixed(1)}%`}
           />
         )}
@@ -76,9 +73,8 @@ export function DiagnosticsPanel({ quality, sensitivity, warmup, trimStart }: Di
 
       {expanded && (
         <div className="diag-details">
-          {/* Data Quality Checks */}
           <section className="diag-section">
-            <h4>Datan laatu</h4>
+            <h4>{t('diagnostics.quality.heading')}</h4>
             <div className="quality-checks">
               {quality.checks.map((check, i) => (
                 <div key={i} className={`quality-check ${check.passed ? 'check-pass' : 'check-fail'}`}>
@@ -90,20 +86,19 @@ export function DiagnosticsPanel({ quality, sensitivity, warmup, trimStart }: Di
               ))}
             </div>
             {quality.removedCount > 0 && (
-              <p className="diag-note">Poistettu {quality.removedCount} epäloogista datapistettä.</p>
+              <p className="diag-note">{t('diagnostics.quality.removed', { count: quality.removedCount })}</p>
             )}
           </section>
 
-          {/* Warmup Detection */}
           <section className="diag-section">
-            <h4>Lämmittelytunnistus</h4>
+            <h4>{t('diagnostics.warmup.heading')}</h4>
             <div className="warmup-info">
               <div className="warmup-info-grid">
-                <div><span className="label">Menetelmä</span><span className="value">{warmupMethodLabel(warmup.method)}</span></div>
-                <div><span className="label">Luottamus</span><span className="value">{warmupConfLabel(warmup.confidence)}</span></div>
-                <div><span className="label">Leikkauspiste</span><span className="value">{formatDuration(warmup.warmupEndSeconds)}</span></div>
+                <div><span className="label">{t('diagnostics.warmup.method')}</span><span className="value">{warmupMethodLabel(warmup.method, t)}</span></div>
+                <div><span className="label">{t('diagnostics.warmup.confidence')}</span><span className="value">{warmupConfLabel(warmup.confidence, t)}</span></div>
+                <div><span className="label">{t('diagnostics.warmup.cutoff')}</span><span className="value">{formatDuration(warmup.warmupEndSeconds)}</span></div>
                 {warmup.hrAtEnd > 0 && (
-                  <div><span className="label">Syke leikkauspisteessä</span><span className="value">{warmup.hrAtEnd} bpm</span></div>
+                  <div><span className="label">{t('diagnostics.warmup.hrAtCutoff')}</span><span className="value">{warmup.hrAtEnd} {t('common.bpm')}</span></div>
                 )}
               </div>
               <p className="warmup-reason">{warmup.reason}</p>
@@ -114,15 +109,11 @@ export function DiagnosticsPanel({ quality, sensitivity, warmup, trimStart }: Di
             )}
           </section>
 
-          {/* Sensitivity Analysis */}
           {sensitivity && (
             <>
               <section className="diag-section">
-                <h4>Herkkyysanalyysi: Lämmittelyleikkaus</h4>
-                <p className="diag-note">
-                  Kuinka paljon driftitulos muuttuu eri lämmittelyleikkauspisteillä.
-                  Vakaa kuvaaja = robusti tulos.
-                </p>
+                <h4>{t('diagnostics.sens.warmupTitle')}</h4>
+                <p className="diag-note">{t('diagnostics.sens.warmupNote')}</p>
                 <WarmupSensitivityChart
                   points={sensitivity.warmupSensitivity}
                   currentWarmup={trimStart}
@@ -130,27 +121,24 @@ export function DiagnosticsPanel({ quality, sensitivity, warmup, trimStart }: Di
               </section>
 
               <section className="diag-section">
-                <h4>GAP-mallien vertailu</h4>
+                <h4>{t('diagnostics.sens.gapTitle')}</h4>
                 <GapModelComparisonView comparison={sensitivity.gapModelComparison} />
               </section>
 
               <section className="diag-section">
-                <h4>Herkkyysanalyysi: Jakopiste</h4>
-                <p className="diag-note">
-                  Kuinka paljon driftitulos muuttuu kun puoliskojen jakopistettä siirretään.
-                  50% = standardi puoliksi jako.
-                </p>
+                <h4>{t('diagnostics.sens.splitTitle')}</h4>
+                <p className="diag-note">{t('diagnostics.sens.splitNote')}</p>
                 <SplitSensitivityChart points={sensitivity.splitSensitivity} />
               </section>
 
               <section className="diag-section">
-                <h4>Bootstrap-luottamusväli (90%)</h4>
+                <h4>{t('diagnostics.sens.ciTitle')}</h4>
                 <ConfidenceIntervalView ci={sensitivity.confidenceInterval} baseDrift={sensitivity.baseResult.gapDecouplingPercent} />
               </section>
 
               {sensitivity.summary && (
                 <div className="diag-summary">
-                  <strong>Yhteenveto:</strong> {sensitivity.summary}
+                  <strong>{t('diagnostics.summary')}</strong> {sensitivity.summary}
                 </div>
               )}
             </>
@@ -195,34 +183,36 @@ function warmupConfidenceScore(w: WarmupDiagnostics): number {
   return 30;
 }
 
-function warmupMethodLabel(method: string): string {
+function warmupMethodLabel(method: string, t: TFunction): string {
   switch (method) {
-    case 'hr-pace-combined': return 'Syke + vauhti (yhdistetty)';
-    case 'hr-only': return 'Pelkkä syke';
-    case 'fallback': return 'Varamenetelmä';
+    case 'hr-pace-combined': return t('diagnostics.warmup.methods.hrPace');
+    case 'hr-only': return t('diagnostics.warmup.methods.hrOnly');
+    case 'fallback': return t('diagnostics.warmup.methods.fallback');
     default: return method;
   }
 }
 
-function warmupConfLabel(conf: string): string {
+function warmupConfLabel(conf: string, t: TFunction): string {
   switch (conf) {
-    case 'high': return 'Korkea';
-    case 'medium': return 'Kohtalainen';
-    case 'low': return 'Matala';
+    case 'high': return t('diagnostics.warmup.conf.high');
+    case 'medium': return t('diagnostics.warmup.conf.medium');
+    case 'low': return t('diagnostics.warmup.conf.low');
     default: return conf;
   }
 }
 
-function WarmupChart({ windows, detectedAt, currentTrim }: {
+function WarmupChart({ windows }: {
   windows: { time: number; avgHR: number; stabilityScore: number; hrRate: number }[];
   detectedAt: number;
   currentTrim: number;
 }) {
+  const { t } = useTranslation();
+
   const data = useMemo(() => ({
     labels: windows.map(w => formatDuration(w.time)),
     datasets: [
       {
-        label: 'Syke (bpm)',
+        label: t('diagnostics.warmup.chart.hrLabel'),
         data: windows.map(w => w.avgHR),
         borderColor: '#ef4444',
         backgroundColor: 'rgba(239, 68, 68, 0.1)',
@@ -232,7 +222,7 @@ function WarmupChart({ windows, detectedAt, currentTrim }: {
         yAxisID: 'y',
       },
       {
-        label: 'Stabiilius',
+        label: t('diagnostics.warmup.chart.stabilityLabel'),
         data: windows.map(w => w.stabilityScore),
         borderColor: '#8b5cf6',
         borderWidth: 1.5,
@@ -240,18 +230,18 @@ function WarmupChart({ windows, detectedAt, currentTrim }: {
         yAxisID: 'y1',
       },
     ],
-  }), [windows]);
+  }), [windows, t]);
 
   const options: ChartOptions<'line'> = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      title: { display: true, text: 'Lämmittelytunnistuksen signaalit', font: { size: 13 } },
+      title: { display: true, text: t('diagnostics.warmup.chart.title'), font: { size: 13 } },
       legend: { display: true, position: 'bottom' },
     },
     scales: {
-      y: { position: 'left', title: { display: true, text: 'Syke (bpm)' } },
-      y1: { position: 'right', title: { display: true, text: 'Stabiilius (pienempi = vakaampi)' }, grid: { drawOnChartArea: false } },
+      y: { position: 'left', title: { display: true, text: t('diagnostics.warmup.chart.hrAxis') } },
+      y1: { position: 'right', title: { display: true, text: t('diagnostics.warmup.chart.stabilityAxis') }, grid: { drawOnChartArea: false } },
     },
   };
 
@@ -266,13 +256,14 @@ function WarmupSensitivityChart({ points, currentWarmup }: {
   points: { warmupSeconds: number; driftPercent: number | null; analyzedMinutes: number }[];
   currentWarmup: number;
 }) {
+  const { t } = useTranslation();
   const validPoints = points.filter(p => p.driftPercent != null);
 
   const data = useMemo(() => ({
     labels: validPoints.map(p => formatDuration(p.warmupSeconds)),
     datasets: [
       {
-        label: 'Drifti (%)',
+        label: t('common.drift'),
         data: validPoints.map(p => p.driftPercent),
         borderColor: '#3b82f6',
         backgroundColor: 'rgba(59, 130, 246, 0.1)',
@@ -286,7 +277,7 @@ function WarmupSensitivityChart({ points, currentWarmup }: {
         fill: true,
       },
     ],
-  }), [validPoints, currentWarmup]);
+  }), [validPoints, currentWarmup, t]);
 
   const options: ChartOptions<'line'> = {
     responsive: true,
@@ -298,14 +289,14 @@ function WarmupSensitivityChart({ points, currentWarmup }: {
         callbacks: {
           label: (ctx) => {
             const p = validPoints[ctx.dataIndex];
-            return `Drifti: ${p.driftPercent?.toFixed(1)}% | Analysoitu: ${p.analyzedMinutes} min`;
+            return t('diagnostics.sens.warmupTooltip', { drift: p.driftPercent?.toFixed(1), minutes: p.analyzedMinutes });
           },
         },
       },
     },
     scales: {
-      x: { title: { display: true, text: 'Lämmittelyleikkaus' } },
-      y: { title: { display: true, text: 'Drifti (%)' } },
+      x: { title: { display: true, text: t('diagnostics.sens.warmupXAxis') } },
+      y: { title: { display: true, text: t('diagnostics.sens.warmupYAxis') } },
     },
   };
 
@@ -319,16 +310,18 @@ function WarmupSensitivityChart({ points, currentWarmup }: {
 function GapModelComparisonView({ comparison }: {
   comparison: { stravaDrift: number | null; minettiDrift: number | null; rawDrift: number | null; difference: number };
 }) {
+  const { t } = useTranslation();
+
   const items = [
-    { label: 'Raaka (ei GAP)', value: comparison.rawDrift },
-    { label: 'Strava GAP', value: comparison.stravaDrift },
-    { label: 'Minetti GAP', value: comparison.minettiDrift },
+    { label: t('diagnostics.models.raw'), value: comparison.rawDrift },
+    { label: t('diagnostics.models.strava'), value: comparison.stravaDrift },
+    { label: t('diagnostics.models.minetti'), value: comparison.minettiDrift },
   ].filter(i => i.value != null);
 
   const data = useMemo(() => ({
     labels: items.map(i => i.label),
     datasets: [{
-      label: 'Drifti (%)',
+      label: t('diagnostics.sens.gapXAxis'),
       data: items.map(i => i.value),
       backgroundColor: items.map((_, idx) =>
         idx === 0 ? 'rgba(107, 114, 128, 0.6)' :
@@ -338,7 +331,7 @@ function GapModelComparisonView({ comparison }: {
       borderWidth: 0,
       borderRadius: 4,
     }],
-  }), [items]);
+  }), [items, t]);
 
   const options: ChartOptions<'bar'> = {
     responsive: true,
@@ -348,14 +341,16 @@ function GapModelComparisonView({ comparison }: {
       legend: { display: false },
       tooltip: {
         callbacks: {
-          label: (ctx) => `${ctx.parsed.x.toFixed(1)}%`,
+          label: (ctx) => `${(ctx.parsed.x ?? 0).toFixed(1)}%`,
         },
       },
     },
     scales: {
-      x: { title: { display: true, text: 'Drifti (%)' } },
+      x: { title: { display: true, text: t('diagnostics.sens.gapXAxis') } },
     },
   };
+
+  const noteKey = comparison.difference > 2 ? 'significant' : 'minor';
 
   return (
     <div>
@@ -363,8 +358,7 @@ function GapModelComparisonView({ comparison }: {
         <Bar data={data} options={options} />
       </div>
       <p className="diag-note">
-        Mallien välinen ero: <strong>{comparison.difference.toFixed(1)}%</strong>-yksikköä.
-        {comparison.difference > 2 ? ' Maasto vaikuttaa tulokseen merkittävästi.' : ' Vähäinen ero — maasto ei juuri vaikuta.'}
+        {t(`diagnostics.sens.gapNote.${noteKey}`, { diff: comparison.difference.toFixed(1) })}
       </p>
     </div>
   );
@@ -373,12 +367,13 @@ function GapModelComparisonView({ comparison }: {
 function SplitSensitivityChart({ points }: {
   points: { splitRatio: number; driftPercent: number | null }[];
 }) {
+  const { t } = useTranslation();
   const validPoints = points.filter(p => p.driftPercent != null);
 
   const data = useMemo(() => ({
     labels: validPoints.map(p => `${Math.round(p.splitRatio * 100)}%`),
     datasets: [{
-      label: 'Drifti (%)',
+      label: t('common.drift'),
       data: validPoints.map(p => p.driftPercent),
       borderColor: '#10b981',
       backgroundColor: 'rgba(16, 185, 129, 0.1)',
@@ -391,7 +386,7 @@ function SplitSensitivityChart({ points }: {
       ),
       fill: true,
     }],
-  }), [validPoints]);
+  }), [validPoints, t]);
 
   const options: ChartOptions<'line'> = {
     responsive: true,
@@ -400,8 +395,8 @@ function SplitSensitivityChart({ points }: {
       legend: { display: false },
     },
     scales: {
-      x: { title: { display: true, text: '1. puoliskon osuus' } },
-      y: { title: { display: true, text: 'Drifti (%)' } },
+      x: { title: { display: true, text: t('diagnostics.sens.splitXAxis') } },
+      y: { title: { display: true, text: t('diagnostics.sens.splitYAxis') } },
     },
   };
 
@@ -412,15 +407,16 @@ function SplitSensitivityChart({ points }: {
   );
 }
 
-function ConfidenceIntervalView({ ci, baseDrift }: {
+function ConfidenceIntervalView({ ci }: {
   ci: { lower: number; median: number; upper: number; width: number };
   baseDrift: number;
 }) {
+  const { t } = useTranslation();
+
   if (ci.width === 0) {
-    return <p className="diag-note">Liian vähän dataa bootstrap-analyysiin.</p>;
+    return <p className="diag-note">{t('diagnostics.ci.tooFew')}</p>;
   }
 
-  // Check if the CI crosses the threshold lines
   const crosses35 = ci.lower < 3.5 && ci.upper > 3.5;
   const crosses50 = ci.lower < 5.0 && ci.upper > 5.0;
 
@@ -436,7 +432,6 @@ function ConfidenceIntervalView({ ci, baseDrift }: {
               left: `${(((ci.median - ci.lower) / ci.width) * 100)}%`,
             }} />
           </div>
-          {/* Threshold markers */}
           <div className="ci-threshold" style={{ left: `${(3.5 / Math.max(ci.upper + 2, 10)) * 100}%` }}>
             <span>3.5%</span>
           </div>
@@ -446,15 +441,15 @@ function ConfidenceIntervalView({ ci, baseDrift }: {
         </div>
       </div>
       <div className="ci-numbers">
-        <span>5%: {ci.lower.toFixed(1)}%</span>
-        <span>Mediaani: {ci.median.toFixed(1)}%</span>
-        <span>95%: {ci.upper.toFixed(1)}%</span>
+        <span>{t('diagnostics.ci.p5', { value: ci.lower.toFixed(1) })}</span>
+        <span>{t('diagnostics.ci.median', { value: ci.median.toFixed(1) })}</span>
+        <span>{t('diagnostics.ci.p95', { value: ci.upper.toFixed(1) })}</span>
       </div>
       {crosses35 && (
-        <p className="diag-issue">⚠ Luottamusväli ylittää 3.5% rajan — AeT-arvio on epävarma.</p>
+        <p className="diag-issue">{t('diagnostics.ci.warningAeT')}</p>
       )}
       {crosses50 && (
-        <p className="diag-issue">⚠ Luottamusväli ylittää 5% rajan — tulkinta voi vaihdella.</p>
+        <p className="diag-issue">{t('diagnostics.ci.warningLT')}</p>
       )}
     </div>
   );

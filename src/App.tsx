@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
+import { useTranslation, Trans } from 'react-i18next';
 import { parseFitFile } from './lib/fitParser';
 import type { ActivitySummary } from './lib/fitParser';
 import { enrichRecords } from './lib/gapCalculator';
@@ -30,6 +31,7 @@ import './App.css';
 type ViewMode = 'landing' | 'single' | 'multi' | 'history';
 
 function App() {
+  const { t, i18n } = useTranslation();
   const [viewMode, setViewMode] = useState<ViewMode>('landing');
   const [activity, setActivity] = useState<ActivitySummary | null>(null);
   const [loading, setLoading] = useState(false);
@@ -41,7 +43,6 @@ function App() {
   const [gapModel, setGapModel] = useState<GapModel>('strava');
   const [numSegments, setNumSegments] = useState(10);
 
-  // Diagnostics state
   const [warmupDiag, setWarmupDiag] = useState<WarmupDiagnostics | null>(null);
 
   const enrichedRecords: EnrichedRecord[] = useMemo(() => {
@@ -66,25 +67,21 @@ function App() {
     return segmentAnalysis(filteredRecords, numSegments);
   }, [filteredRecords, numSegments]);
 
-  // Data quality assessment
   const dataQuality: DataQualityReport | null = useMemo(() => {
     if (enrichedRecords.length === 0) return null;
     return assessDataQuality(enrichedRecords);
   }, [enrichedRecords]);
 
-  // Sensitivity analysis
   const sensitivity: SensitivityResult | null = useMemo(() => {
     if (!activity || !driftResult) return null;
     return runSensitivityAnalysis(activity.records, trimStart, trimEnd, gapModel);
   }, [activity, trimStart, trimEnd, gapModel, driftResult]);
 
-  // DFA Alpha1 analysis
   const dfaResult: DFAResult | null = useMemo(() => {
     if (!activity || !activity.hasHRV) return null;
     return analyzeDFAAlpha1(activity.rrIntervals);
   }, [activity]);
 
-  // Temperature compensation
   const tempComp: TemperatureCompensation | null = useMemo(() => {
     if (!activity || !driftResult || !activity.hasTemperature) return null;
     const temps = filteredRecords.map(r => r.temperature ?? null);
@@ -102,19 +99,18 @@ function App() {
       setActivity(parsed);
       setViewMode('single');
 
-      // Auto-detect warmup end with full diagnostics
       const enriched = enrichRecords(parsed.records, gapModel);
       const diag = detectWarmupEndWithDiagnostics(enriched);
       setWarmupDiag(diag);
       setTrimStart(diag.warmupEndSeconds);
       setTrimEnd(parsed.totalDuration);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Tuntematon virhe');
+      setError(err instanceof Error ? err.message : t('app.unknownError'));
       setActivity(null);
     } finally {
       setLoading(false);
     }
-  }, [gapModel]);
+  }, [gapModel, t]);
 
   const handleReset = useCallback(() => {
     setActivity(null);
@@ -126,7 +122,6 @@ function App() {
     setViewMode('landing');
   }, []);
 
-  // Save current analysis to history
   const handleSaveToHistory = useCallback(() => {
     if (!activity || !driftResult) return;
 
@@ -134,12 +129,10 @@ function App() {
     const dfaAeT = dfaResult?.hrvt1 ?? null;
     const dfaLT = dfaResult?.hrvt2 ?? null;
 
-    // Use best available estimate
     let aetHR: number | null = null;
     let method: 'drift' | 'dfa-alpha1' | 'combined' = 'drift';
 
     if (driftAeT != null && dfaAeT != null) {
-      // Both available — average them (cross-validated)
       aetHR = Math.round((driftAeT + dfaAeT) / 2);
       method = 'combined';
     } else if (dfaAeT != null) {
@@ -149,7 +142,6 @@ function App() {
       aetHR = driftAeT;
       method = 'drift';
     } else {
-      // No threshold found, still save the analysis
       aetHR = null;
     }
 
@@ -175,37 +167,47 @@ function App() {
     setSaved(true);
   }, [activity, driftResult, dfaResult, sensitivity, gapModel]);
 
+  const toggleLanguage = useCallback(() => {
+    i18n.changeLanguage(i18n.language === 'fi' ? 'en' : 'fi');
+  }, [i18n]);
+
   return (
     <div className="app">
       <header>
-        <h1 onClick={() => handleReset()} style={{ cursor: 'pointer' }}>Compensated Thresholds</h1>
-        <p className="subtitle">Aerobisen kynnyksen analyysi maastojuoksulle</p>
+        <h1 onClick={() => handleReset()} style={{ cursor: 'pointer' }}>{t('app.title')}</h1>
+        <p className="subtitle">{t('app.subtitle')}</p>
+        <button
+          className="lang-toggle"
+          onClick={toggleLanguage}
+          title={i18n.language === 'fi' ? 'Switch to English' : 'Vaihda suomeksi'}
+        >
+          {i18n.language === 'fi' ? 'EN' : 'FI'}
+        </button>
       </header>
 
-      {/* Landing page */}
       {viewMode === 'landing' && (
         <>
           <div className="mode-selector">
             <div className="mode-card" onClick={() => setViewMode('landing')}>
-              <h3>Yksittäinen suoritus</h3>
-              <p>Analysoi yksi juoksu ja laske drifti</p>
+              <h3>{t('app.single.title')}</h3>
+              <p>{t('app.single.desc')}</p>
               <FileUpload onFileLoaded={handleFileLoaded} loading={loading} />
             </div>
             <div className="mode-card" onClick={() => setViewMode('multi')}>
-              <h3>Monta suoritusta</h3>
-              <p>Lataa useita juoksuja ja etsi kynnys automaattisesti</p>
+              <h3>{t('app.multi.title')}</h3>
+              <p>{t('app.multi.desc')}</p>
               <div className="mode-card-action">
-                Avaa monen suorituksen analyysi →
+                {t('app.multi.open')}
               </div>
             </div>
           </div>
 
           <div className="mode-selector" style={{ gridTemplateColumns: '1fr' }}>
             <div className="mode-card" onClick={() => setViewMode('history')}>
-              <h3>Seuranta</h3>
-              <p>Näe aerobisen kynnyksen kehitys ajan yli</p>
+              <h3>{t('app.history.title')}</h3>
+              <p>{t('app.history.desc')}</p>
               <div className="mode-card-action">
-                Avaa historia →
+                {t('app.history.open')}
               </div>
             </div>
           </div>
@@ -213,31 +215,30 @@ function App() {
           {error && <div className="error">{error}</div>}
 
           <div className="info-box">
-            <h3>Miten tämä toimii?</h3>
+            <h3>{t('app.how.title')}</h3>
             <ol>
-              <li><strong>Yksittäinen suoritus:</strong> Lataa yksi FIT-tiedosto — sovellus laskee GAP-kompensoidun driftin ja DFA alpha1 -analyysin (jos HRV-data saatavilla)</li>
-              <li><strong>Monta suoritusta:</strong> Lataa 3–6 juoksua eri sykealueilta → automaattinen kynnyksen haku</li>
-              <li><strong>Seuranta:</strong> Tallenna tulokset ja seuraa AeT:n kehitystä harjoittelun edetessä</li>
+              <li><strong>{t('app.how.singleTitle')}</strong> {t('app.how.single')}</li>
+              <li><strong>{t('app.how.multiTitle')}</strong> {t('app.how.multi')}</li>
+              <li><strong>{t('app.how.historyTitle')}</strong> {t('app.how.history')}</li>
             </ol>
             <p>
-              <strong>Kaksi itsenäistä menetelmää:</strong> HR-drifti (Pa:Hr decoupling) ja DFA alpha1 (HRV-pohjainen). Kun molemmat ovat saatavilla, ne ristiin validoivat toisensa.
+              <strong>{t('app.how.methodsTitle')}</strong> {t('app.how.methods')}
             </p>
           </div>
         </>
       )}
 
-      {/* Single file view */}
       {viewMode === 'single' && activity && (
         <>
           <div className="toolbar">
-            <button onClick={handleReset} className="btn-reset">← Takaisin</button>
+            <button onClick={handleReset} className="btn-reset">{t('common.back')}</button>
             {driftResult && (
               <button
                 onClick={handleSaveToHistory}
                 className={`btn-save-history ${saved ? 'saved' : ''}`}
                 disabled={saved}
               >
-                {saved ? '✓ Tallennettu' : 'Tallenna historiaan'}
+                {saved ? t('app.saved') : t('app.save')}
               </button>
             )}
           </div>
@@ -264,7 +265,6 @@ function App() {
             />
           )}
 
-          {/* DFA Alpha1 Panel */}
           {dfaResult && (
             <DFAPanel
               dfaResult={dfaResult}
@@ -272,19 +272,13 @@ function App() {
             />
           )}
 
-          {/* No HRV data notice */}
           {activity && !activity.hasHRV && (
             <div className="info-box" style={{ marginBottom: '1rem' }}>
-              <h3>DFA Alpha1 ei saatavilla</h3>
-              <p>
-                Tiedostossa ei ole RR-intervallidataa. DFA alpha1 -analyysi vaatii
-                rintasensorin (Polar H10, Garmin HRM-Pro) joka tallentaa beat-to-beat -datan.
-                Ota HRV-tallennus käyttöön kellossasi.
-              </p>
+              <h3>{t('app.noHrv.title')}</h3>
+              <p>{t('app.noHrv.text')}</p>
             </div>
           )}
 
-          {/* Diagnostics Panel */}
           {dataQuality && warmupDiag && (
             <DiagnosticsPanel
               quality={dataQuality}
@@ -305,28 +299,30 @@ function App() {
 
           {filteredRecords.length < 20 && (
             <div className="error">
-              Liian vähän datapisteitä valitulla aikavälillä. Laajenna analysoitavaa osuutta.
+              {t('app.tooFewPoints')}
             </div>
           )}
         </>
       )}
 
-      {/* Multi file view */}
       {viewMode === 'multi' && (
         <MultiFileView onBack={handleReset} />
       )}
 
-      {/* History view */}
       {viewMode === 'history' && (
         <HistoryPanel onBack={handleReset} />
       )}
 
       <footer>
         <p>
-          Perustuu <a href="https://uphillathlete.com/aerobic-training/heart-rate-drift/" target="_blank" rel="noopener">
-          Uphill Athlete</a> -metodiin, <a href="https://help.trainingpeaks.com/hc/en-us/articles/204071724" target="_blank" rel="noopener">
-          TrainingPeaks</a> Pa:Hr-analyysiin ja <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7845545/" target="_blank" rel="noopener">
-          Rogers et al. (2021)</a> DFA alpha1 -tutkimukseen.
+          <Trans
+            i18nKey="app.footer"
+            components={{
+              uphill: <a href="https://uphillathlete.com/aerobic-training/heart-rate-drift/" target="_blank" rel="noopener" />,
+              tp: <a href="https://help.trainingpeaks.com/hc/en-us/articles/204071724" target="_blank" rel="noopener" />,
+              rogers: <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7845545/" target="_blank" rel="noopener" />,
+            }}
+          />
         </p>
       </footer>
     </div>

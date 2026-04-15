@@ -1,0 +1,40 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Build
+        run: npm ci && npm run build
+
+      - name: Configure AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::043319837191:role/multi-infra-github-artifacts
+          aws-region: eu-north-1
+
+      - name: Deploy to S3
+        run: aws s3 sync dist/ s3://compensated-thresholds-frontend-site-043319837191/ --delete
+
+      - name: Invalidate CloudFront
+        run: |
+          DIST_ID=$(aws cloudfront list-distributions \
+            --query "DistributionList.Items[?Aliases.Items[0]=='compensated-thresholds.d.jussil.fi'].Id | [0]" \
+            --output text)
+          aws cloudfront create-invalidation --distribution-id "$DIST_ID" --paths "/*"

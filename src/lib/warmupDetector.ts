@@ -259,7 +259,7 @@ function hasSpeedData(windows: WarmupWindow[], idx: number): boolean {
 function buildResult(
   windows: WarmupWindow[],
   detectionIdx: number,
-  confirmOffset: number,
+  _confirmOffset: number,
   method: WarmupDiagnostics['method'],
   confidence: WarmupDiagnostics['confidence'],
   reason: string,

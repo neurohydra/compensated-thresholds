@@ -75,7 +75,7 @@ export function analyzeDFAAlpha1(rrIntervals: RRInterval[]): DFAResult {
   }
 
   // Determine sensor type from quality flags
-  const hasQualityFlags = validRR.some(rr => rr.quality != null);
+  void validRR.some(rr => rr.quality != null);
   const sensorType = inferSensorType(validRR);
 
   // Compute rolling windows
