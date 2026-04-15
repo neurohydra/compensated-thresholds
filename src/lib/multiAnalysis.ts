@@ -43,8 +43,8 @@ export interface ThresholdEstimate {
   aetHR: number;
   /** Confidence: how close the interpolation points are */
   confidence: 'high' | 'medium' | 'low';
-  /** Description */
-  description: string;
+  descriptionKey: string;
+  descriptionParams: Record<string, string | number>;
   /** The two activities used to interpolate (below and above) */
   belowActivity: AnalyzedActivity | null;
   aboveActivity: AnalyzedActivity | null;
@@ -188,7 +188,8 @@ export function estimateThreshold(activities: AnalyzedActivity[]): ThresholdEsti
     return {
       aetHR: Math.round(avgAeT),
       confidence: atThreshold.length >= 2 ? 'high' : 'medium',
-      description: `${atThreshold.length} suoritusta osui 3.5-5% driftialueelle. Aerobinen kynnys on noin ${Math.round(avgAeT)} bpm.`,
+      descriptionKey: 'multi.threshold.desc.atThreshold',
+      descriptionParams: { count: atThreshold.length, hr: Math.round(avgAeT) },
       belowActivity: atThreshold[0],
       aboveActivity: atThreshold[atThreshold.length - 1],
     };
@@ -214,7 +215,8 @@ export function estimateThreshold(activities: AnalyzedActivity[]): ThresholdEsti
       return {
         aetHR: Math.round(aetHR),
         confidence,
-        description: `Interpoloitu suorituksista: ${low.testHR} bpm (${driftLow.toFixed(1)}% drifti) ja ${high.testHR} bpm (${driftHigh.toFixed(1)}% drifti). Sykealueiden väli: ${hrGap} bpm.`,
+        descriptionKey: 'multi.threshold.desc.interpolated',
+        descriptionParams: { lowHR: low.testHR, lowDrift: driftLow.toFixed(1), highHR: high.testHR, highDrift: driftHigh.toFixed(1), gap: hrGap },
         belowActivity: low,
         aboveActivity: high,
       };
@@ -230,7 +232,8 @@ export function estimateThreshold(activities: AnalyzedActivity[]): ThresholdEsti
     return {
       aetHR: highest.testHR + 5,
       confidence: 'low',
-      description: `Kaikki suoritukset olivat alle 3.5% driftin. AeT on todennäköisesti yli ${highest.testHR} bpm. Testaa korkeammalla sykkeellä.`,
+      descriptionKey: 'multi.threshold.desc.allBelow',
+      descriptionParams: { hr: highest.testHR },
       belowActivity: highest,
       aboveActivity: null,
     };
@@ -241,7 +244,8 @@ export function estimateThreshold(activities: AnalyzedActivity[]): ThresholdEsti
     return {
       aetHR: lowest.testHR - 5,
       confidence: 'low',
-      description: `Kaikki suoritukset ylittivät 5% driftin. AeT on todennäköisesti alle ${lowest.testHR} bpm. Testaa matalammalla sykkeellä.`,
+      descriptionKey: 'multi.threshold.desc.allAbove',
+      descriptionParams: { hr: lowest.testHR },
       belowActivity: null,
       aboveActivity: lowest,
     };

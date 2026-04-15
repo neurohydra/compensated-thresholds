@@ -26,9 +26,15 @@ import { DiagnosticsPanel } from './components/DiagnosticsPanel';
 import { DFAPanel } from './components/DFAPanel';
 import { HistoryPanel } from './components/HistoryPanel';
 import { MultiFileView } from './components/MultiFileView';
+import { ResultsSummary } from './components/ResultsSummary';
 import './App.css';
 
 type ViewMode = 'landing' | 'single' | 'multi' | 'history';
+
+// Wrapper that strips react-i18next's internal i18nIsDynamicList prop before it reaches the DOM.
+function TransLink({ i18nIsDynamicList: _, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement> & { i18nIsDynamicList?: unknown }) {
+  return <a {...props} />;
+}
 
 function App() {
   const { t, i18n } = useTranslation();
@@ -243,6 +249,8 @@ function App() {
             )}
           </div>
 
+          <ResultsSummary hasDFA={!!activity.hasHRV} />
+
           <ActivityInfo activity={activity} />
 
           <TrimSelector
@@ -318,9 +326,9 @@ function App() {
           <Trans
             i18nKey="app.footer"
             components={{
-              uphill: <a href="https://uphillathlete.com/aerobic-training/heart-rate-drift/" target="_blank" rel="noopener" />,
-              tp: <a href="https://help.trainingpeaks.com/hc/en-us/articles/204071724" target="_blank" rel="noopener" />,
-              rogers: <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7845545/" target="_blank" rel="noopener" />,
+              uphill: <TransLink href="https://uphillathlete.com/aerobic-training/heart-rate-drift/" target="_blank" rel="noopener" />,
+              tp: <TransLink href="https://help.trainingpeaks.com/hc/en-us/articles/204071724" target="_blank" rel="noopener" />,
+              rogers: <TransLink href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7845545/" target="_blank" rel="noopener" />,
             }}
           />
         </p>

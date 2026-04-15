@@ -51,6 +51,7 @@ export function DFAPanel({ dfaResult, driftAeT }: DFAPanelProps) {
             <span className="label">{t('dfa.hrv1.label')}</span>
             <span className="big-value">{dfaResult.hrvt1} <small>{t('common.bpm')}</small></span>
             <span className="sub">{t('dfa.hrv1.sub')}</span>
+            <span className="card-desc">{t('dfa.hrv1.desc')}</span>
           </div>
         )}
         {dfaResult.hrvt2 != null && (
@@ -58,12 +59,14 @@ export function DFAPanel({ dfaResult, driftAeT }: DFAPanelProps) {
             <span className="label">{t('dfa.hrv2.label')}</span>
             <span className="big-value">{dfaResult.hrvt2} <small>{t('common.bpm')}</small></span>
             <span className="sub">{t('dfa.hrv2.sub')}</span>
+            <span className="card-desc">{t('dfa.hrv2.desc')}</span>
           </div>
         )}
         {driftAeT != null && dfaResult.hrvt1 != null && (
           <div className="dfa-threshold-card dfa-compare">
-            <span className="label">{t('dfa.crossVal')}</span>
+            <span className="label">{t('dfa.crossVal.label')}</span>
             <CrossValidation driftAeT={driftAeT} dfaAeT={dfaResult.hrvt1} t={t} />
+            <span className="card-desc">{t('dfa.crossVal.desc')}</span>
           </div>
         )}
       </div>

@@ -66,7 +66,7 @@ export function DiagnosticsPanel({ quality, sensitivity, warmup, trimStart }: Di
       {quality.issues.length > 0 && (
         <div className="diag-issues">
           {quality.issues.map((issue, i) => (
-            <div key={i} className="diag-issue">⚠ {issue}</div>
+            <div key={i} className="diag-issue">⚠ {t(issue.key, issue.params)}</div>
           ))}
         </div>
       )}
@@ -79,9 +79,9 @@ export function DiagnosticsPanel({ quality, sensitivity, warmup, trimStart }: Di
               {quality.checks.map((check, i) => (
                 <div key={i} className={`quality-check ${check.passed ? 'check-pass' : 'check-fail'}`}>
                   <span className="check-icon">{check.passed ? '✓' : '✗'}</span>
-                  <span className="check-name">{check.name}</span>
+                  <span className="check-name">{t(check.nameKey)}</span>
                   <span className="check-score">{check.score}/100</span>
-                  <span className="check-detail">{check.detail}</span>
+                  <span className="check-detail">{t(check.detailKey, check.detailParams)}</span>
                 </div>
               ))}
             </div>
@@ -136,9 +136,10 @@ export function DiagnosticsPanel({ quality, sensitivity, warmup, trimStart }: Di
                 <ConfidenceIntervalView ci={sensitivity.confidenceInterval} baseDrift={sensitivity.baseResult.gapDecouplingPercent} />
               </section>
 
-              {sensitivity.summary && (
+              {sensitivity.summaryKeys.length > 0 && (
                 <div className="diag-summary">
-                  <strong>{t('diagnostics.summary')}</strong> {sensitivity.summary}
+                  <strong>{t('diagnostics.summary')}</strong>{' '}
+                  {sensitivity.summaryKeys.map(s => t(s.key, s.params)).join(' ')}
                 </div>
               )}
             </>

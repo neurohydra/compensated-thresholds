@@ -20,8 +20,8 @@ export interface SensitivityResult {
   confidenceInterval: ConfidenceInterval;
   /** Overall robustness score 0-100 */
   robustnessScore: number;
-  /** Summary text */
-  summary: string;
+  /** Summary as array of i18n key + params */
+  summaryKeys: Array<{ key: string; params?: Record<string, string | number> }>;
 }
 
 export interface WarmupSensitivityPoint {
@@ -156,26 +156,26 @@ export function runSensitivityAnalysis(
     ciStability * 0.3
   );
 
-  // Summary
-  const summaryParts: string[] = [];
+  // Summary as i18n key + params array
+  const summaryKeys: Array<{ key: string; params?: Record<string, string | number> }> = [];
   if (robustnessScore >= 75) {
-    summaryParts.push('Tulos on robusti — pienet parametrimuutokset eivät vaikuta merkittävästi.');
+    summaryKeys.push({ key: 'diagnostics.sens.summaryRobust' });
   } else if (robustnessScore >= 50) {
-    summaryParts.push('Tulos on kohtuullisen vakaa, mutta jotkut parametrit vaikuttavat siihen.');
+    summaryKeys.push({ key: 'diagnostics.sens.summaryStable' });
   } else {
-    summaryParts.push('Tulos on herkkä parametrimuutoksille — tulkitse varovaisesti.');
+    summaryKeys.push({ key: 'diagnostics.sens.summarySensitive' });
   }
 
   if (gapModelDifference > 2) {
-    summaryParts.push(`GAP-mallien välillä ${gapModelDifference.toFixed(1)}%-yksikön ero — maasto vaikuttaa tulokseen merkittävästi.`);
+    summaryKeys.push({ key: 'diagnostics.sens.summaryGapModel', params: { diff: gapModelDifference.toFixed(1) } });
   }
 
   if (ciWidth > 3) {
-    summaryParts.push(`Luottamusväli on leveä (${confidenceInterval.lower.toFixed(1)}–${confidenceInterval.upper.toFixed(1)}%) — datasetti on kohinainen.`);
+    summaryKeys.push({ key: 'diagnostics.sens.summaryCIWide', params: { lower: confidenceInterval.lower.toFixed(1), upper: confidenceInterval.upper.toFixed(1) } });
   }
 
   if (warmupRange > 3) {
-    summaryParts.push('Lämmittelyleikkaus vaikuttaa tulokseen merkittävästi — varmista oikea leikkauspiste.');
+    summaryKeys.push({ key: 'diagnostics.sens.summaryWarmup' });
   }
 
   return {
@@ -190,7 +190,7 @@ export function runSensitivityAnalysis(
     splitSensitivity,
     confidenceInterval,
     robustnessScore,
-    summary: summaryParts.join(' '),
+    summaryKeys,
   };
 }
 
@@ -316,6 +316,6 @@ function emptyResult(): SensitivityResult {
     splitSensitivity: [],
     confidenceInterval: { lower: 0, median: 0, upper: 0, width: 0 },
     robustnessScore: 0,
-    summary: 'Sensitiivisyysanalyysia ei voitu suorittaa — liian vähän dataa.',
+    summaryKeys: [{ key: 'diagnostics.sens.summaryTooFewData' }],
   };
 }

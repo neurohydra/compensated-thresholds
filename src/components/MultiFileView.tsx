@@ -251,7 +251,7 @@ function ThresholdPanel({ estimate }: { estimate: ThresholdEstimate }) {
           {t(`multi.threshold.${estimate.confidence}`)}
         </span>
       </div>
-      <p className="threshold-desc">{estimate.description}</p>
+      <p className="threshold-desc">{t(estimate.descriptionKey, estimate.descriptionParams)}</p>
       {estimate.confidence === 'low' && (
         <p className="threshold-hint">{t('multi.threshold.hint')}</p>
       )}

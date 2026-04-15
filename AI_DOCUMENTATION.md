@@ -85,13 +85,20 @@ Load 3-6 runs at different heart rate intensities. The app:
 - **Chart.js** (react-chartjs-2) — all visualizations
 - **@garmin/fitsdk** — FIT binary file parsing
 - **localStorage** — history persistence (no server needed)
+- **i18next + react-i18next** — internationalisation (Finnish / English)
+- **i18next-browser-languagedetector** — auto-detect browser language, cached to localStorage (`ct-language`)
 
 ### File Structure
 
 ```
 src/
 ├── App.tsx                          # Main app, view routing, state management
-├── App.css                          # All styles
+├── App.css                          # Component-level styles
+├── index.css                        # Global styles, CSS variables
+├── i18n.ts                          # i18next initialisation (language detection, locale bundles)
+├── locales/
+│   ├── fi.json                      # Finnish translations (~450 keys)
+│   └── en.json                      # English translations (~450 keys)
 ├── lib/
 │   ├── fitParser.ts                 # FIT file parsing (records, HRV, temperature, power)
 │   ├── gapCalculator.ts             # Grade Adjusted Pace (Strava + Minetti models)
@@ -157,10 +164,16 @@ interface EnrichedRecord extends FitRecord {
 }
 
 // From driftAnalysis.ts
+interface ThresholdInterpretation {
+  level: 'below' | 'at' | 'above';
+  descriptionKey: string;        // i18n key, e.g. 'drift.interp.below.desc'
+  descriptionParams: Record<string, string | number>;
+}
+
 interface DriftResult {
   rawDecouplingPercent: number;
   gapDecouplingPercent: number;
-  interpretation: 'below' | 'at' | 'above';
+  interpretation: ThresholdInterpretation;
   suggestedAeT: number | null;
   firstHalf: HalfStats;
   secondHalf: HalfStats;
@@ -272,16 +285,18 @@ When both drift and DFA results are available:
 
 ---
 
-## Language Notes
+## Localisation
 
-The UI is in **Finnish** (the user's language). Key terms:
+The UI supports **Finnish** (default) and **English**. Language is auto-detected from the browser and cached in localStorage (`ct-language`). A toggle button in the header switches between languages.
+
+All user-visible strings live in `src/locales/fi.json` and `src/locales/en.json`. Components use `useTranslation()` from react-i18next. Helper functions that need translated strings receive `t: TFunction` as a parameter. Lib files (`src/lib/`) never contain hardcoded UI strings — they return i18n keys + params instead (e.g. `ThresholdInterpretation.descriptionKey`).
+
+Key Finnish domain terms (for understanding existing translation keys):
 - Syke = Heart rate
 - Lämmittely = Warmup
 - Analysoitava osuus = Analyzed section
-- Sykealue = Heart rate range
 - Aerobinen kynnys = Aerobic threshold
 - Suoritus = Activity/workout
-- Segmentti = Segment
 - Datan laatu = Data quality
 - Seuranta = Tracking/monitoring
 

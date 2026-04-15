@@ -20,15 +20,16 @@ export function DriftResultPanel({ result, tempComp }: DriftResultProps) {
   return (
     <div className="drift-result">
       <h2>{t('drift.heading')}</h2>
+      <p className="panel-intro">{t('drift.intro')}</p>
 
       <div className={`interpretation ${levelClass}`}>
         <div className="interp-header">
-          <span className="interp-badge">{result.interpretation.message}</span>
+          <span className="interp-badge">{t(`drift.interp.${result.interpretation.level}.message`)}</span>
           <span className="interp-drift">
             {t('drift.gapDrift')} <strong>{result.gapDecouplingPercent.toFixed(1)}%</strong>
           </span>
         </div>
-        <p>{result.interpretation.description}</p>
+        <p>{t(result.interpretation.descriptionKey, result.interpretation.descriptionParams)}</p>
         {result.suggestedAeT && (
           <p className="suggested-aet">
             {t('drift.suggestedAeT')} <strong>{result.suggestedAeT} {t('common.bpm')}</strong>

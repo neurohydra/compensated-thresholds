@@ -103,6 +103,20 @@
     "heading": "Drift analysis",
     "gapDrift": "GAP-compensated drift:",
     "suggestedAeT": "Estimated aerobic threshold (AeT):",
+    "interp": {
+      "below": {
+        "message": "Below AeT",
+        "desc": "Drift {{value}}% is below 3.5%. Your aerobic threshold is likely higher. Repeat the test 5 bpm higher."
+      },
+      "at": {
+        "message": "AeT found!",
+        "desc": "Drift {{value}}% is between 3.5–5%. Your aerobic threshold is approximately {{hr}} bpm."
+      },
+      "above": {
+        "message": "Above AeT",
+        "desc": "Drift {{value}}% is above 5%. Starting heart rate was too high. Repeat the test at a lower heart rate."
+      }
+    },
     "temp": {
       "heading": "Temperature compensation",
       "temperature": "Temperature",
@@ -122,6 +136,7 @@
       "efGap": "EF (GAP)",
       "driftPrefix": "Drift:"
     },
+    "intro": "The analyzed section is split into two equal halves by time. Efficiency Factor (EF = GAP speed / heart rate) is compared between halves: a drop in EF means heart rate has \"drifted\" upward — a sign you are running at or above your aerobic threshold.",
     "note": {
       "duration": "Analyzed duration:",
       "explanation": "EF (Efficiency Factor) = speed / heart rate. When EF drops in the second half, heart rate has \"drifted\" upward relative to pace. The GAP-compensated value accounts for terrain, normalizing the effect of hills."
@@ -134,13 +149,18 @@
     },
     "hrv1": {
       "label": "HRVT1 (AeT)",
-      "sub": "DFA α1 = 0.75"
+      "sub": "DFA α1 = 0.75",
+      "desc": "Your aerobic threshold. Below this heart rate your body runs primarily on fat and aerobic metabolism. This is the upper limit for Zone 2 and long easy runs."
     },
     "hrv2": {
       "label": "HRVT2 (AnT/LT2)",
-      "sub": "DFA α1 = 0.50"
+      "sub": "DFA α1 = 0.50",
+      "desc": "Your lactate threshold (LT2 / VT2). Above this heart rate, lactate accumulates faster than it clears. Use for tempo and threshold interval targets — sustainable only for ~40–60 min at most."
     },
-    "crossVal": "Cross-validation",
+    "crossVal": {
+      "label": "Cross-validation",
+      "desc": "Compares the AeT from drift analysis with HRVT1 from DFA. Both methods target the same physiological boundary. Close agreement validates the result."
+    },
     "chart": {
       "timeTitle": "DFA Alpha1 over time",
       "dfaLabel": "DFA α1",
@@ -221,6 +241,13 @@
     },
     "sens": {
       "warmupTitle": "Sensitivity: warmup cutoff",
+      "summaryRobust": "Result is robust — small parameter changes have no significant effect.",
+      "summaryStable": "Result is reasonably stable, but some parameters do affect it.",
+      "summarySensitive": "Result is sensitive to parameter changes — interpret with caution.",
+      "summaryGapModel": "GAP model difference: {{diff}}%-units — terrain significantly affects the result.",
+      "summaryCIWide": "Confidence interval is wide ({{lower}}–{{upper}}%) — dataset is noisy.",
+      "summaryWarmup": "Warmup cutoff significantly affects the result — verify the correct cutoff point.",
+      "summaryTooFewData": "Sensitivity analysis could not run — too little data.",
       "warmupNote": "How much drift changes with different warmup cutoff points. Stable chart = robust result.",
       "warmupXAxis": "Warmup cutoff",
       "warmupYAxis": "Drift (%)",
@@ -339,7 +366,13 @@
       "high": "High confidence",
       "medium": "Moderate confidence",
       "low": "Low confidence",
-      "hint": "Add more activities near the threshold zone for a better estimate."
+      "hint": "Add more activities near the threshold zone for a better estimate.",
+      "desc": {
+        "atThreshold": "{{count}} activities landed in the 3.5–5% drift zone. Aerobic threshold is approximately {{hr}} bpm.",
+        "interpolated": "Interpolated from activities: {{lowHR}} bpm ({{lowDrift}}% drift) and {{highHR}} bpm ({{highDrift}}% drift). HR gap: {{gap}} bpm.",
+        "allBelow": "All activities were below 3.5% drift. AeT is likely above {{hr}} bpm. Test at a higher heart rate.",
+        "allAbove": "All activities exceeded 5% drift. AeT is likely below {{hr}} bpm. Test at a lower heart rate."
+      }
     },
     "chart": {
       "title": "HR vs. Drift — Aerobic threshold detection",
@@ -365,6 +398,84 @@
       "end": "End:"
     },
     "errorInFile": "Error in file {{file}}: {{error}}"
+  },
+  "quality": {
+    "check": {
+      "hrCompleteness": {
+        "name": "HR data completeness",
+        "detail": "{{percent}}% of data points contain HR data ({{count}}/{{total}})"
+      },
+      "hrPlausibility": {
+        "name": "HR plausibility",
+        "pass": "All HR values are physiologically valid (30–220 bpm)",
+        "fail": "{{count}} implausible HR value(s) detected"
+      },
+      "hrSpikes": {
+        "name": "HR spikes (> 20 bpm/s)",
+        "pass": "No sudden HR spikes",
+        "fail": "{{count}} sudden HR spike(s) detected"
+      },
+      "speed": {
+        "name": "Speed plausibility",
+        "pass": "All speed values are plausible",
+        "fail": "{{count}} implausible speed value(s) (> 8 m/s)"
+      },
+      "gpsAlt": {
+        "name": "GPS altitude quality",
+        "pass": "Altitude data is smooth",
+        "fail": "{{count}} large altitude jump(s) (> 10 m) — GPS noise"
+      },
+      "sampling": {
+        "name": "Sampling rate",
+        "detail": "Average interval: {{interval}} s, {{gaps}} gap(s) in data"
+      },
+      "terrain": {
+        "name": "Terrain balance (halves)",
+        "detail": "1st half: {{first}}% avg grade, 2nd half: {{second}}%. Diff: {{diff}} %-units."
+      }
+    },
+    "issue": {
+      "hrMissing": "HR data missing for {{percent}}% of data points",
+      "hrSpikes": "{{count}} HR spike(s) — possible chest strap contact issue",
+      "gpsNoise": "Significant GPS altitude noise — GAP calculation accuracy may be affected",
+      "dataGaps": "Multiple data gaps — watch auto-pause or GPS dropout",
+      "terrainImbalance": "Half terrain profiles differ significantly — drift result may be skewed"
+    }
+  },
+  "results": {
+    "guide": {
+      "heading": "How to read these results",
+      "toggle": {
+        "show": "▼ Show guide",
+        "hide": "▲ Hide guide"
+      },
+      "overview": "This analysis detected your aerobic threshold (AeT) — the heart rate where your aerobic system shifts to a more mixed energy supply. Two independent methods cross-validate each other for higher confidence.",
+      "sections": {
+        "drift": {
+          "title": "Drift analysis (Pa:Hr decoupling)",
+          "text": "Compares the first and second half of the run. When heart rate rises relative to pace (EF drops), your body works harder to hold the same speed — a sign you are at or above AeT. GAP compensation removes the effect of hills so the test is valid on any terrain."
+        },
+        "dfa": {
+          "title": "DFA Alpha1 (HRV-based)",
+          "text": "Analyzes beat-to-beat heart rate variability in rolling 120-second windows. As intensity rises, the variability pattern changes. α1 = 0.75 marks the aerobic threshold (HRVT1 = AeT); α1 = 0.50 marks the anaerobic threshold (HRVT2 = LT2). Requires a chest strap with RR interval recording (e.g. Polar H10, Garmin HRM-Pro)."
+        },
+        "crossval": {
+          "title": "Cross-validation (inside DFA panel)",
+          "text": "Compares the AeT from drift analysis with HRVT1 from DFA. Both target the same physiological threshold — close agreement confirms the result. A large difference may mean the test effort was at the wrong intensity or that one dataset had quality issues."
+        },
+        "diagnostics": {
+          "title": "Analysis reliability",
+          "text": "Scores data quality (GPS, HR sensor, sampling rate) and result robustness (sensitivity to warmup cutoff and split point). Check this if the drift or DFA results seem unexpected — low scores indicate the test conditions were not ideal."
+        }
+      },
+      "reading": {
+        "heading": "Color coding in drift analysis",
+        "below": "Green — Below AeT. Effort was easy; your true threshold is higher.",
+        "at": "Yellow — At AeT. Threshold found. This is your Zone 2 ceiling.",
+        "above": "Red — Above AeT. Effort was too intense; threshold is lower."
+      },
+      "linked": "Drift AeT and DFA HRVT1 both estimate the same threshold from different angles. When they agree, save the result to History to track how your aerobic fitness develops over training."
+    }
   },
   "charts": {
     "hrPace": {

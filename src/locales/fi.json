@@ -103,6 +103,20 @@
     "heading": "Driftianalyysi",
     "gapDrift": "GAP-kompensoitu drifti:",
     "suggestedAeT": "Arvioitu aerobinen kynnys (AeT):",
+    "interp": {
+      "below": {
+        "message": "Alle AeT:n",
+        "desc": "Drifti {{value}}% on alle 3.5%. Aerobinen kynnys on todennäköisesti korkeammalla. Toista testi 5 bpm korkeammalla aloitussykkeellä."
+      },
+      "at": {
+        "message": "AeT löydetty!",
+        "desc": "Drifti {{value}}% on välillä 3.5–5%. Aerobinen kynnyksesi on noin {{hr}} bpm."
+      },
+      "above": {
+        "message": "Yli AeT:n",
+        "desc": "Drifti {{value}}% on yli 5%. Aloitussyke oli liian korkea. Toista testi matalammalla sykkeellä."
+      }
+    },
     "temp": {
       "heading": "Lämpötilakompensaatio",
       "temperature": "Lämpötila",
@@ -122,6 +136,7 @@
       "efGap": "EF (GAP)",
       "driftPrefix": "Drifti:"
     },
+    "intro": "Analysoitu osuus jaetaan kahteen yhtä pitkään puoliskoon. Tehokkuuskerroin (EF = GAP-nopeus / syke) vertaillaan puoliskojen välillä: EF:n lasku tarkoittaa, että syke on \"driftannut\" ylöspäin — merkki siitä, että juokset aerobisella kynnyksellä tai sen yläpuolella.",
     "note": {
       "duration": "Analysoitu kesto:",
       "explanation": "EF (Efficiency Factor) = nopeus / syke. Kun EF laskee toisessa puoliskossa, syke on \"driftannut\" ylöspäin suhteessa vauhtiin. GAP-kompensoitu arvo huomioi maastonmuodot, joten mäkien vaikutus on normalisoitu."
@@ -134,13 +149,18 @@
     },
     "hrv1": {
       "label": "HRVT1 (AeT)",
-      "sub": "DFA α1 = 0.75"
+      "sub": "DFA α1 = 0.75",
+      "desc": "Aerobinen kynnyksesi. Tämän sykkeen alapuolella elimistösi käyttää pääasiassa rasvaa ja aerobista aineenvaihduntaa. Tämä on vyöhyke 2:n ja pitkien helppojen juoksujen yläraja."
     },
     "hrv2": {
       "label": "HRVT2 (AnT/LT2)",
-      "sub": "DFA α1 = 0.50"
+      "sub": "DFA α1 = 0.50",
+      "desc": "Laktaattikynnys (LT2 / VT2). Tämän sykkeen yläpuolella laktaatti kertyy nopeammin kuin poistuu. Käytä tempo- ja kynnysintervallien tavoitteena — kestää enintään noin 40–60 minuuttia."
     },
-    "crossVal": "Ristiin validointi",
+    "crossVal": {
+      "label": "Ristiin validointi",
+      "desc": "Vertaa driftianalyysin AeT:tä DFA:n HRVT1:een. Molemmat menetelmät kohdistuvat samaan fysiologiseen rajaan. Läheinen yhteneväisyys vahvistaa tuloksen."
+    },
     "chart": {
       "timeTitle": "DFA Alpha1 ajan funktiona",
       "dfaLabel": "DFA α1",
@@ -221,6 +241,13 @@
     },
     "sens": {
       "warmupTitle": "Herkkyysanalyysi: Lämmittelyleikkaus",
+      "summaryRobust": "Tulos on robusti — pienet parametrimuutokset eivät vaikuta merkittävästi.",
+      "summaryStable": "Tulos on kohtuullisen vakaa, mutta jotkut parametrit vaikuttavat siihen.",
+      "summarySensitive": "Tulos on herkkä parametrimuutoksille — tulkitse varovaisesti.",
+      "summaryGapModel": "GAP-mallien välillä {{diff}}%-yksikön ero — maasto vaikuttaa tulokseen merkittävästi.",
+      "summaryCIWide": "Luottamusväli on leveä ({{lower}}–{{upper}}%) — datasetti on kohinainen.",
+      "summaryWarmup": "Lämmittelyleikkaus vaikuttaa tulokseen merkittävästi — varmista oikea leikkauspiste.",
+      "summaryTooFewData": "Sensitiivisyysanalyysia ei voitu suorittaa — liian vähän dataa.",
       "warmupNote": "Kuinka paljon driftitulos muuttuu eri lämmittelyleikkauspisteillä. Vakaa kuvaaja = robusti tulos.",
       "warmupXAxis": "Lämmittelyleikkaus",
       "warmupYAxis": "Drifti (%)",
@@ -339,7 +366,13 @@
       "high": "Korkea luottamus",
       "medium": "Kohtalainen luottamus",
       "low": "Matala luottamus",
-      "hint": "Lisää suorituksia lähempänä kynnysaluetta paremman arvion saamiseksi."
+      "hint": "Lisää suorituksia lähempänä kynnysaluetta paremman arvion saamiseksi.",
+      "desc": {
+        "atThreshold": "{{count}} suoritusta osui 3.5–5% driftialueelle. Aerobinen kynnys on noin {{hr}} bpm.",
+        "interpolated": "Interpoloitu suorituksista: {{lowHR}} bpm ({{lowDrift}}% drifti) ja {{highHR}} bpm ({{highDrift}}% drifti). Sykealueiden väli: {{gap}} bpm.",
+        "allBelow": "Kaikki suoritukset olivat alle 3.5% driftin. AeT on todennäköisesti yli {{hr}} bpm. Testaa korkeammalla sykkeellä.",
+        "allAbove": "Kaikki suoritukset ylittivät 5% driftin. AeT on todennäköisesti alle {{hr}} bpm. Testaa matalammalla sykkeellä."
+      }
     },
     "chart": {
       "title": "Syke vs. Drifti — Aerobisen kynnyksen haku",
@@ -365,6 +398,84 @@
       "end": "Loppu:"
     },
     "errorInFile": "Virhe tiedostossa {{file}}: {{error}}"
+  },
+  "quality": {
+    "check": {
+      "hrCompleteness": {
+        "name": "Sykedatan kattavuus",
+        "detail": "{{percent}}% datapisteistä sisältää syketiedon ({{count}}/{{total}})"
+      },
+      "hrPlausibility": {
+        "name": "Sykearvojen loogisuus",
+        "pass": "Kaikki sykearvot ovat fysiologisesti mahdollisia (30–220 bpm)",
+        "fail": "{{count}} epäloogista sykearvoa havaittu"
+      },
+      "hrSpikes": {
+        "name": "Sykepiikit (> 20 bpm/s)",
+        "pass": "Ei äkillisiä sykepiikkejä",
+        "fail": "{{count}} äkillistä sykepiikkiä havaittu"
+      },
+      "speed": {
+        "name": "Nopeusarvojen loogisuus",
+        "pass": "Kaikki nopeusarvot ovat loogisia",
+        "fail": "{{count}} epäloogista nopeusarvoa (> 8 m/s)"
+      },
+      "gpsAlt": {
+        "name": "GPS-korkeusdata",
+        "pass": "Korkeusdata on tasaista",
+        "fail": "{{count}} suurta korkeushyppyä (> 10 m) — GPS-kohinaa"
+      },
+      "sampling": {
+        "name": "Näytteenottotaajuus",
+        "detail": "Keskimääräinen väli: {{interval}} s, {{gaps}} aukkoa datassa"
+      },
+      "terrain": {
+        "name": "Maastobalanssi (puoliskot)",
+        "detail": "1. puolisko: {{first}}% keskim. kaltevuus, 2. puolisko: {{second}}%. Ero: {{diff}} %-yksikköä."
+      }
+    },
+    "issue": {
+      "hrMissing": "Sykedata puuttuu {{percent}}% datapisteistä",
+      "hrSpikes": "{{count}} sykepiikkiä — mahdollinen rintasensorin kontaktiongelma",
+      "gpsNoise": "Merkittävää GPS-korkeuskohinaa — GAP-laskennan tarkkuus kärsii",
+      "dataGaps": "Datassa useita aukkoja — kellon automaattinen tauko tai GPS-katkos",
+      "terrainImbalance": "Puoliskojen maastoprofiilit eroavat merkittävästi — driftitulos voi olla vääristynyt"
+    }
+  },
+  "results": {
+    "guide": {
+      "heading": "Kuinka lukea tuloksia",
+      "toggle": {
+        "show": "▼ Näytä opas",
+        "hide": "▲ Piilota opas"
+      },
+      "overview": "Analyysi havaitsi aerobisen kynnyksesi (AeT) — sykkeen jossa aerobinen energiantuotto siirtyy sekamuotoiseen. Kaksi itsenäistä menetelmää ristiin validoivat toisensa luotettavuuden parantamiseksi.",
+      "sections": {
+        "drift": {
+          "title": "Driftianalyysi (Pa:Hr decoupling)",
+          "text": "Vertaa juoksun ensimmäistä ja toista puoliskoa. Kun syke nousee suhteessa vauhtiin (EF laskee), elimistö joutuu tekemään enemmän töitä saman vauhdin ylläpitämiseksi — merkki siitä, että olet AeT:llä tai sen yläpuolella. GAP-kompensaatio poistaa mäkien vaikutuksen, joten testi on pätevä millä tahansa maastolla."
+        },
+        "dfa": {
+          "title": "DFA Alpha1 (HRV-pohjainen)",
+          "text": "Analysoi beat-to-beat -sykevaihtelu 120 sekunnin liukuvissa ikkunoissa. Rasituksen kasvaessa vaihtelun rakenne muuttuu. α1 = 0.75 merkitsee aerobisen kynnyksen (HRVT1 = AeT); α1 = 0.50 merkitsee anaerobisen kynnyksen (HRVT2 = LT2). Vaatii rintasensorin RR-intervallirekisteröinnillä (esim. Polar H10, Garmin HRM-Pro)."
+        },
+        "crossval": {
+          "title": "Ristiin validointi (DFA-paneelissa)",
+          "text": "Vertaa driftianalyysin AeT:tä DFA:n HRVT1:een. Molemmat kohdistavat saman fysiologisen kynnyksen — läheinen yhteneväisyys vahvistaa tuloksen. Suuri ero voi tarkoittaa, että testirasitus oli väärällä intensiteettialueella tai datan laadussa oli ongelmia."
+        },
+        "diagnostics": {
+          "title": "Analyysin luotettavuus",
+          "text": "Pisteytyy datan laadun (GPS, sykesensori, näytteenoton tasaisuus) ja tulosten robustiuden (herkkyys lämmittely- ja jakopisteiden suhteen). Tarkista tämä jos drifti- tai DFA-tulokset näyttävät poikkeuksellisilta — matalat pisteet viittaavat siihen, että testiolosuhteet eivät olleet optimaaliset."
+        }
+      },
+      "reading": {
+        "heading": "Värikoodaus driftianalyysissä",
+        "below": "Vihreä — Alle AeT. Rasitus oli helppo; todellinen kynnys on korkeammalla.",
+        "at": "Keltainen — AeT löydetty. Tämä on vyöhyke 2:n yläraja.",
+        "above": "Punainen — Yli AeT. Rasitus oli liian kova; kynnys on matalammalla."
+      },
+      "linked": "Driftin AeT ja DFA:n HRVT1 arvioivat molemmat samaa kynnystä eri näkökulmista. Kun ne ovat yhtä mieltä, tallenna tulos Historiaan seurataksesi aerobisen kuntosi kehitystä harjoittelun yli."
+    }
   },
   "charts": {
     "hrPace": {

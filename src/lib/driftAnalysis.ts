@@ -37,8 +37,8 @@ export interface DriftResult {
 
 export interface ThresholdInterpretation {
   level: 'below' | 'at' | 'above';
-  message: string;
-  description: string;
+  descriptionKey: string;
+  descriptionParams: Record<string, string | number>;
 }
 
 export interface SegmentAnalysis {
@@ -62,20 +62,20 @@ function interpret(decoupling: number, avgHR: number): ThresholdInterpretation {
   if (decoupling < 3.5) {
     return {
       level: 'below',
-      message: 'Alle AeT:n',
-      description: `Drifti ${decoupling.toFixed(1)}% on alle 3.5%. Aerobinen kynnys on todennäköisesti korkeammalla. Toista testi 5 bpm korkeammalla aloitussykkeellä.`,
+      descriptionKey: 'drift.interp.below.desc',
+      descriptionParams: { value: decoupling.toFixed(1) },
     };
   } else if (decoupling <= 5.0) {
     return {
       level: 'at',
-      message: 'AeT löydetty!',
-      description: `Drifti ${decoupling.toFixed(1)}% on välillä 3.5-5%. Aerobinen kynnyksesi on noin ${Math.round(avgHR)} bpm.`,
+      descriptionKey: 'drift.interp.at.desc',
+      descriptionParams: { value: decoupling.toFixed(1), hr: Math.round(avgHR) },
     };
   } else {
     return {
       level: 'above',
-      message: 'Yli AeT:n',
-      description: `Drifti ${decoupling.toFixed(1)}% on yli 5%. Aloitussyke oli liian korkea. Toista testi matalammalla sykkeellä.`,
+      descriptionKey: 'drift.interp.above.desc',
+      descriptionParams: { value: decoupling.toFixed(1) },
     };
   }
 }
